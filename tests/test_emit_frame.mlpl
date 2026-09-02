@@ -1,0 +1,33 @@
+# Public emit_frame identity and disconnected-execution contract.
+
+@test {name: "emit_frame returns scalar and vector inputs unchanged", tags: ["emit-frame", "identity"]}
+def u:test_emit_frame_scalar_vector_identity() {
+  "Prove observation is an identity tap for scalar and rank-one values.";
+  u:assert_eq(emit_frame("scalar", 0, 7), 7, "scalar identity")?;
+  u:assert_eq(emit_frame("vector", 1, [2, 3, 5]), [2, 3, 5], "vector identity")
+}
+
+@test {name: "emit_frame returns matrix and rank-three inputs unchanged", tags: ["emit-frame", "ranks"]}
+def u:test_emit_frame_higher_rank_identity() {
+  "Prove observation preserves rank-two and rank-three numeric tensors.";
+  matrix = [[1, 2], [3, 4]];
+  tensor = [[[1, 2]], [[3, 4]]];
+  u:assert_eq(emit_frame("matrix", 2, matrix), matrix, "matrix identity")?;
+  u:assert_eq(emit_frame("tensor", 3, tensor), tensor, "rank-three identity")
+}
+
+@test {name: "emit_frame accepts empty numeric arrays", tags: ["emit-frame", "boundary"]}
+def u:test_emit_frame_empty_identity() {
+  "Pin the empty rank-one boundary without inventing payload values.";
+  u:assert_eq(emit_frame("empty", 4, []), [], "empty identity")
+}
+
+@test {name: "disconnected repeated observations preserve computation", tags: ["emit-frame", "disconnected"]}
+def u:test_emit_frame_disconnected_sequence() {
+  "Show repeated local observations remain no-op identity taps without a sink.";
+  first = emit_frame("phase/input", 0, [1, 2]);
+  second = emit_frame("phase/output", 0, first + 1);
+  u:assert_eq(second, [2, 3], "disconnected sequence result")
+}
+
+u:run_registered_tests()

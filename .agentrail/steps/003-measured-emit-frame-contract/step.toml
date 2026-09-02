@@ -1,6 +1,6 @@
 number = 3
 slug = "measured-emit-frame-contract"
-status = "pending"
+status = "in-progress"
 description = "Use TDD to establish native mlplunit and tool-selection infrastructure, then ..."
 role = "legacy"
 context_files = []

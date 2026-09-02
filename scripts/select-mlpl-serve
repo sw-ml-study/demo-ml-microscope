@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+adjacent="$repo_root/../sw-mlpl/target/release/mlpl-serve"
+
+if [ -n "${MLPL_SERVE:-}" ]; then
+    candidate=$MLPL_SERVE
+else
+    candidate=$adjacent
+fi
+
+case "$candidate" in
+    /*) ;;
+    *) echo "MLPL_SERVE must resolve to an absolute path: $candidate" >&2; exit 1 ;;
+esac
+[ -x "$candidate" ] || { echo "mlpl-serve executable not found: $candidate" >&2; exit 1; }
+printf '%s\n' "$candidate"

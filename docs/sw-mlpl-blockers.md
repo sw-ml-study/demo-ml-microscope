@@ -1,14 +1,14 @@
 # sw-MLPL capability ledger
 
-Status here is based on source/documentation inspection during the foundation
-step. It must be replaced or strengthened with executable probes in the next
-step. No item is an authorized upstream request yet.
+Status combines source inspection with native mlplunit and live loopback SSE
+probes documented in `observation-contract.md`. No item is an authorized
+upstream request yet.
 
 ## Supported
 
 | Capability | Current evidence | Initial use |
 |---|---|---|
-| Numeric observation | `emit_frame(name, step, x)` is documented as whole-tensor connect output and identity-returning | assembly primitive for MLPL helper |
+| Numeric observation | Native tests prove disconnected identity for scalar through rank three; SSE proves ordered name/step/shape/value events | assembly primitive for literal lesson checkpoints |
 | Numeric arrays and labeled dimensions | language and array contracts in `../sw-mlpl` | lesson state and shape explanations |
 | Autograd/training | current evaluator/model APIs and demos | regression and later backward lessons |
 | Attention inspection | `attention_weights` returns rank-2 or rank-3 maps | later attention lesson, not new Rust |
@@ -19,25 +19,25 @@ step. No item is an authorized upstream request yet.
 
 | Capability | Why awkward | Downstream experiment |
 |---|---|---|
-| Multiple observations per logical step | `emit_frame` exposes name and numeric step but no frozen group/phase contract | same step with stable slash names; test ordering |
+| Multiple observations per logical step | SSE preserves calls sharing a step, but there is no explicit group/phase envelope | same integer step with stable slash names |
 | Semantic roles and explanations | tensor event is numeric; roles/notes lack a demonstrated typed envelope | naming convention plus independent lesson text |
-| Recorded playback | current live board/frame trace is not yet a lesson-level retained timeline contract | generate bounded artifact/static view locally |
+| Recorded playback | SSE carries all frames, but browser `frame_trace` retains only the latest per generation | local bounded SSE recorder/static view |
 | Shape-directed view selection | host can inspect shape but producer hint semantics are not frozen | infer defaults in downstream viewer contract |
 | Large observation policy | no microscope-specific total frame/byte contract is established | tiny values; reject rather than silently sample |
 | Gradient introspection | general autograd exists, but exact intermediate/parameter surfaces need probes | tiny explicit models and focused tests |
 
 ## Not yet demonstrated / candidate blockers
 
-These are questions, not confirmed blockers:
+These are questions or confirmed host limitations, not authorized blockers:
 
-1. Can public connect/WASM consumers retain multiple named tensors in exact
-   emission order with sufficient numeric fidelity and visible budget errors?
+1. The current browser frame store cannot retain multiple named tensors; can a
+   generic bounded host change solve this without changing the evaluator?
 2. Can strings/annotations and optional presentation roles share a generic
    ordered timeline without encoding metadata into numeric tensors or names?
 3. Do interpreted, compiled, REPL/connect, and WASM paths expose equivalent
    frame semantics?
-4. Can a browser host provide bounded retained playback without changes to the
-   evaluator, or is only host work required?
+4. Which explicit per-event and per-run budgets should a browser recorder
+   enforce, and how should visible eviction/error behavior work?
 5. Which public APIs expose the gradients needed for an honest tiny-backprop
    lesson without reimplementing autograd?
 

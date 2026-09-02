@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+mlpl=$($repo_root/scripts/select-mlpl)
+
+check_failure() {
+    fixture=$1
+    pattern=$2
+    stderr_file=$(mktemp)
+    if "$mlpl" "$repo_root/tests/fixtures/$fixture" >/dev/null 2>"$stderr_file"; then
+        echo "expected $fixture to fail" >&2
+        rm -f "$stderr_file"
+        exit 1
+    fi
+    if ! grep -q "$pattern" "$stderr_file"; then
+        echo "unexpected diagnostic for $fixture:" >&2
+        sed -n '1,12p' "$stderr_file" >&2
+        rm -f "$stderr_file"
+        exit 1
+    fi
+    rm -f "$stderr_file"
+}
+
+check_failure emit_frame_bad_name.mlpl "name must be a string literal"
+check_failure emit_frame_bad_arity.mlpl "expects 3 arguments"
+echo "PASS emit_frame rejects dynamic names and wrong arity"

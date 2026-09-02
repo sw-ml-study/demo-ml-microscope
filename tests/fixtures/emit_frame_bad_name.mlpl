@@ -1,0 +1,3 @@
+# Dynamic observation names are rejected by the current public builtin.
+name = "dynamic";
+emit_frame(name, 0, [1, 2])

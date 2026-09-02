@@ -24,10 +24,10 @@ current emit_frame assembly primitive
             |
 renderer-neutral recorded observations
             |
-  +---------+----------+
-  |                    |
-static/text host   later generic hosts
-numeric evidence  browser / native extension
+  +---------+-------------------+
+  |                             |
+static/text host       preferred Yew/WASM host
+numeric evidence       optional native graphics host
 ```
 
 The observation API should remain tiny until three distinct lessons agree on
@@ -55,20 +55,27 @@ an experimental MLPL helper while its API is being proven.
 helpers. Installation must use its immutable revision and hash lock rather than
 an adjacent checkout at runtime.
 
-`demo-extensions` should eventually own an optional generic native viewer:
-bounded frame ingestion/storage, cards/charts/tensor inspection, playback,
-selection, and its Port/window/render lifecycle. It should reuse the existing
-headless and parked-main architecture without learning ML algorithm names.
+`demo-extensions` should own the preferred full-featured Rust/Yew WASM viewer:
+bounded SSE ingestion/storage, cards/charts/tensor inspection, source and
+explanation panels, playback, selection, and accessible browser interaction.
+Its Rust model/reducer and protocol parser must remain headlessly testable. The
+existing native graphics support remains an optional second renderer for 3-D
+or desktop use; it may reuse the established Port/window lifecycle without
+learning ML algorithm names.
 
 `sw-mlpl` remains the language and generic browser host. Proposed changes need
 a minimal executable reproducer from this repo and interpreter/compiler/WASM
 acceptance. Existing `emit_frame` is the starting point, not evidence that new
 builtins are already required.
 
+The exact version-zero behavior lessons may rely on is frozen in the
+[recorded observation contract](observation-contract.md).
+
 ## Explicit non-boundaries
 
 - Attention, PCA, K-means, LoRA, and Engram remain MLPL programs.
 - The transformer implementation remains sw-MLPL's existing model machinery.
 - Recorded playback does not imply live pause/resume.
-- A native viewer does not replace browser/static consumers.
+- The Yew/WASM viewer does not replace static/numeric acceptance evidence, and
+  an optional native viewer does not fork the observation semantics.
 - Visualization does not replace numeric assertions or textual explanations.

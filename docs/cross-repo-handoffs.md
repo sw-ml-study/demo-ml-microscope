@@ -26,33 +26,43 @@ Do not move lesson names, phase choices, ML explanations, algorithms, or host
 rendering into the library. Do not claim a richer protocol than the three
 measured consumers prove.
 
-## `../demo-extensions`: generic Rust/native viewer
+## `../demo-extensions`: preferred Rust/Yew WASM microscope
 
-Trigger: this repo has a versioned prerecorded observation artifact plus
-headless acceptance fixtures and has demonstrated a need not met by static or
-browser rendering.
+Trigger: this repo has the measured ordered SSE contract plus matrix lesson
+fixtures. Yew/WASM is the preferred full-featured UI; existing native graphics
+support is optional follow-up work.
 
 The extension agent should:
 
-1. define a versioned, renderer-neutral input envelope for bounded prerecorded
-   frames and reject unknown versions, malformed shapes, non-finite values, and
-   budget overflow deterministically;
-2. implement generic tensor summaries, scalar cards, lines/bars, scatter,
-   heatmaps, rank-3 slice selection, observation selection, and
-   previous/next/play/seek controls in Rust;
-3. reuse the established `winit`/`wgpu`, worker/parked-main Port, retained-state,
-   and headless-test architecture where it is a clean fit;
-4. keep ingestion, validation, storage, layout, rendering, and input handling
-   responsibility-separated and run `sw-checklist` there because this is the
-   Rust workstream to which that tool applies;
-5. prove the parser and state transitions headlessly; make interactive smoke
-   checks opt-in; document ownership/copy/lifetime and retained-byte budgets;
-6. expose only generic private-provider/public-MLPL-facade operations if live
-   extension ingestion is later needed.
+1. create a Yew WASM application that connects to the existing sw-MLPL session
+   and `eval_stream` APIs, runs user-editable MLPL, and records every ordered
+   `event: frame` rather than using the latest-only live-frame store;
+2. define a versioned internal, renderer-neutral run/frame/observation model and
+   reject malformed shapes, non-finite values, unknown versions, and byte/frame
+   budget overflow deterministically before state enters the UI;
+3. implement source, lesson/explanation, run, frame, and observation navigation;
+   previous/next/play/seek controls; scalar cards; tensor summaries; lines/bars;
+   scatter; heatmaps; rank-three slice selection; and accessible text/table
+   fallbacks in Rust/Yew;
+4. group observations by numeric step while preserving call order and literal
+   slash-separated names. Keep run status, transport errors, retention/eviction,
+   and disconnected state visible;
+5. separate transport, validation, bounded retention, playback reducer,
+   shape-directed view planning, and Yew components. Run `sw-checklist` there
+   because this is the Rust workstream to which that tool applies;
+6. test parsing, budgets, reducer transitions, ordering, selection, playback,
+   reconnect/error behavior, and view planning natively/headlessly. Add browser
+   WASM tests for component wiring and keep manual browser smoke opt-in;
+7. consume matrix fixtures from this repository as the first integration
+   contract, then add regression and K-means without algorithm-specific Rust;
+8. only after the 2-D browser path is accepted, evaluate the existing
+   `wgpu`/`winit` support as an optional renderer for 3-D surfaces, PCA clouds,
+   or desktop use. Share the protocol/model rather than forking semantics.
 
 Forbidden Rust concepts include transformer, attention, PCA, K-means, LoRA,
-Engram, optimizer, or lesson-specific viewer types. The first viewer consumes a
-completed recording; it does not pause the MLPL evaluator.
+Engram, optimizer, or lesson-specific viewer types. The first Yew UI records a
+run delivered by SSE and replays retained frames; it does not pause or reverse
+the MLPL evaluator.
 
 ## `../sw-mlpl`: language and browser host
 
@@ -68,14 +78,15 @@ Likely protocol agent work, if proven:
   disconnected behavior, error propagation, and explicit byte/frame budgets;
 - prove evaluator, REPL/connect, compiler, and WASM parity with contract tests.
 
-Likely browser agent work, after the protocol is stable:
+Possible core browser/server work, only when the Yew implementation proves it
+cannot remain downstream:
 
-- add a generic Explorer consumer with bounded retention, run/frame/observation
-  navigation, play/pause/seek over retained data, shape-directed rendering,
-  textual tensor summaries, rank-3 slice selection, and accessible static
-  fallbacks;
-- keep it algorithm-neutral and preserve existing REPL/editor/tutorial flows;
-- test malformed/oversized events and deterministic eviction visibly.
+- expose or stabilize only the generic session/SSE/CORS/protocol behavior the
+  external Yew client needs;
+- add explicit event/run budgets or metadata only when downstream validation
+  cannot provide the required semantics;
+- preserve existing REPL/editor/tutorial flows and prove compatibility across
+  interpreter, server, and WASM paths.
 
 Do not add an ML-specific syntax form, reverse execution, evaluator suspension,
 a dashboard DSL, or special algorithm renderer as part of the first request.

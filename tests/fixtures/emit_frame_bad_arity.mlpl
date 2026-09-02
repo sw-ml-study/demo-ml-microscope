@@ -1,0 +1,2 @@
+# emit_frame requires exactly a name, numeric step, and numeric value.
+emit_frame("missing-value", 0)

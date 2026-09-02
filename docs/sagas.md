@@ -10,15 +10,16 @@ Acceptance: generated instructions are current, peer license files compare
 byte-for-byte, local documentation links resolve, the local MLPL/documentation
 gate passes, and no sibling worktree is modified.
 
-## Queued: measured emit-frame contract
+## Completed: measured emit-frame contract
 
 Add native mlplunit/tool-selection infrastructure and probe current
 `emit_frame` behavior: identity return, disconnected no-op, accepted numeric
 shapes, name/step behavior, event ordering, and connect-path payload. Freeze a
 small recorded-observation contract from measured evidence.
 
-Acceptance: focused tests fail before the fixture exists, then pass through the
-configured adjacent interpreter; `just check` includes the probe and mlplunit.
+Accepted: four native mlplunit identity/rank/boundary tests, two public error
+fixtures, and a live loopback SSE probe now run under `just check`. The measured
+contract is in `docs/observation-contract.md`.
 
 ## Queued: matrix concept stepping
 

@@ -18,9 +18,10 @@ or native work.
 - [`demo-mlpl-libraries`](../demo-mlpl-libraries) is the future home for a
   domain-neutral observation helper only after three unrelated lessons prove
   its API. This repository will then consume a revision-pinned vendored copy.
-- [`demo-extensions`](../demo-extensions) is the future home for an optional
-  generic native recorded-frame viewer and its Rust implementation. It must not
-  contain algorithm-specific visualizers.
+- [`demo-extensions`](../demo-extensions) is the future home for the preferred
+  full-featured Rust/Yew WASM microscope. Its existing native graphics support
+  may later provide optional desktop/3-D views. Neither renderer may contain
+  algorithm-specific visualizers.
 - [`sw-mlpl`](../sw-mlpl) should change only for measured language-wide gaps,
   such as a versioned frame protocol or generic browser Explorer host that
   cannot be expressed downstream.
@@ -43,9 +44,11 @@ LoRA, and Engram. Existing sw-MLPL model and visualization primitives remain
 the implementation; this repository does not build another transformer in
 Rust.
 
-Read the [architecture](docs/architecture.md), [delivery plan](docs/plan.md),
-[saga queue](docs/sagas.md), and [capability ledger](docs/sw-mlpl-blockers.md)
-before implementing a lesson. The original design discussion is retained in
+Read the [architecture](docs/architecture.md), measured
+[observation contract](docs/observation-contract.md),
+[delivery plan](docs/plan.md), [saga queue](docs/sagas.md), and
+[capability ledger](docs/sw-mlpl-blockers.md) before implementing a lesson.
+The original design discussion is retained in
 [`docs/research.txt`](docs/research.txt).
 
 ## Development process
@@ -62,17 +65,19 @@ The foundation gate is:
 just check
 ```
 
-It currently checks repository structure, documentation links, the generated
-Agentrail briefing, and MLPL style readiness. Future executable steps must
-extend the gate with capability probes, demos, and native mlplunit tests.
+It checks repository structure, documentation links, the generated Agentrail
+briefing, canonical MLPL style, native mlplunit tests, public error diagnostics,
+and the loopback SSE frame contract. Future lesson steps must extend the gate
+with their focused demos and acceptance tests.
 `sw-checklist` is reserved for Rust work in `../demo-extensions` and is not a
 gate for this MLPL repository.
 
 ## Current status
 
-The repository foundation and cross-repository contracts are being
-established. No microscope lesson is claimed runnable yet. Recorded playback,
-not reverse interpreter execution or pause/resume debugging, is the first
-target.
+The measured `emit_frame` contract is complete. It proves ordered full-tensor
+SSE events and disconnected identity behavior, while also showing that the
+current browser store retains only the latest frame. The next step is the first
+visible matrix-multiplication microscope. Recorded playback—not reverse
+interpreter execution or pause/resume debugging—is the first target.
 
 Copyright (c) 2026 Michael A Wright. Distributed under the [MIT License](LICENSE).

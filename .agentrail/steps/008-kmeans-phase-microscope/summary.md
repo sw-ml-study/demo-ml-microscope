@@ -1,0 +1,1 @@
+Added deterministic two-cluster K-means in standalone MLPL with explicit assignment/update observations, lower-index tie policy, bounded convergence and boundary tests, a freshness-checked accessible SVG, an exact five-frame SSE-backed Yew fixture, catalog and documentation integration, and a revision-pinned demo-extensions handoff.

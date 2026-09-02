@@ -1,0 +1,8 @@
+number = 9
+slug = "shared-observation-helper-review"
+status = "pending"
+description = "Review the matrix, linear-regression, and K-means consumers to identify the s..."
+role = "legacy"
+context_files = []
+created_at = "2026-09-02T07:47:20"
+commits = []

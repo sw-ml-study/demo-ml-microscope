@@ -1,0 +1,1 @@
+Established and published the MLPL-first microscope repository foundation: generated Agentrail instructions, peer-identical MIT licensing, README conventions, architecture and delivery plan, capability ledger, saga queue, explicit read-only sibling handoffs, and a passing documentation-only precommit gate. Sibling worktrees were inspected but not modified.

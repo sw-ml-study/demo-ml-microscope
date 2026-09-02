@@ -1,0 +1,2040 @@
+Today 12:52 PM
+look at 
+TimSamshuijzen/complexityzoneand my repo 
+sw-ml-study/sw-mlpl-- how can I add visualizations and features like the ones implemented in the first repo.  Note its live demo: https://complexity.zone/tlmgpt/  I would also like to step through and visualize ML concepts/tasks
+or can be implemented in a demo repo using sw-MLPL instead of Rust
+
+You’re asking two related questions:
+
+What should sw-MLPL learn from complexityzone/tlmgpt as an interactive ML visualization environment?
+How much should be implemented as reusable Rust infrastructure versus ordinary sw-MLPL programs in a demo repo?
+
+After looking at both projects, I think the second question is the more important one. The educational ML content should overwhelmingly live in sw-MLPL. Rust should supply a small, generic visualization/observation substrate.
+
+tlmGPT is impressive, but its architecture is effectively a bespoke tiny-transformer simulator welded directly to its UI. Its index.html contains the tokenizer, matrix kernels, forward/backward implementations, model parameter storage, training loop, caches, and visualization code. That is appropriate for a self-contained teaching artifact, but it is not the architecture I would copy into sw-MLPL.
+
+Your project is already much farther along toward something more general.
+
+What you already have
+
+sw-MLPL currently has:
+
+native arrays/tensors and labeled dimensions
+autograd
+optimizers and train
+Model DSL
+attention and attention_weights
+tiny-transformer training/generation
+execution tracing
+browser WASM execution
+inline SVG rendering
+scatter, line, bar and heatmap
+decision boundaries
+histograms
+confusion matrices
+loss curves
+loss landscapes
+attention overlays
+3D plotting support
+browser REPL/editor/tutorial infrastructure
+server/connect mode with SSE
+and, particularly interesting for this proposal, emit_frame(name, step, x), which can stream an entire tensor as a live frame.
+
+So you are surprisingly close.
+
+The missing abstraction is not really "visualization."
+
+It is:
+
+Make the execution of an MLPL program observable as a sequence of semantically named states.
+
+That gives you a general-purpose ML microscope.
+
+I would split this into two layers
+                sw-MLPL program
+                     │
+              ordinary ML code
+                     │
+          ┌──────────┴───────────┐
+          │                      │
+       observe()              emit_frame()
+       metric()                  │
+       snapshot()                │
+          │                      │
+          └──────────┬───────────┘
+                     │
+                Viz protocol
+                     │
+       ┌─────────────┼──────────────┐
+       │             │              │
+    inspector      chart        animation
+       │             │              │
+  tensor/shape    SVG plots      step timeline
+  gradients       heatmaps       play/pause
+  parameters      scatter        scrub/rewind
+
+The bottom layer belongs in Rust.
+
+The experiment above it belongs in .mlpl.
+
+That distinction is important.
+
+A demo-ml-visualization repo
+
+I would probably make this a separate repo rather than putting all of it in sw-mlpl.
+
+Something like:
+
+demo-ml-visualization
+
+or, perhaps more accurately,
+
+demo-ml-explorer
+
+I prefer demo-ml-explorer, because many of these are not merely visualizations.
+
+You are exploring execution.
+
+The repo might start as:
+
+demo-ml-explorer/
+    README.md
+
+    foundations/
+        vectors.mlpl
+        matrix-multiply.mlpl
+        linear-regression.mlpl
+        gradient-descent.mlpl
+
+    neural-networks/
+        perceptron.mlpl
+        mlp-forward.mlpl
+        mlp-training.mlpl
+        activations.mlpl
+        decision-boundary.mlpl
+
+    transformers/
+        tokenization.mlpl
+        embeddings.mlpl
+        positional-encoding.mlpl
+        qkv.mlpl
+        attention.mlpl
+        multi-head-attention.mlpl
+        transformer-block.mlpl
+        tiny-transformer.mlpl
+
+    training/
+        loss-landscape.mlpl
+        sgd.mlpl
+        momentum.mlpl
+        adam.mlpl
+        overfitting.mlpl
+        regularization.mlpl
+
+    representation/
+        pca.mlpl
+        embeddings.mlpl
+        clustering.mlpl
+        dimensionality-reduction.mlpl
+
+    modern/
+        lora.mlpl
+        moe.mlpl
+        engram.mlpl
+        quantization.mlpl
+        speculative-decoding.mlpl
+
+Each program is executable MLPL, not a canned Javascript animation.
+
+That is a very strong demonstration of the language.
+
+The central feature: MLPL execution frames
+
+You already have this:
+
+emit_frame(name, step, x)
+
+which streams a tensor through connect mode.
+
+I would generalize the concept slightly.
+
+Imagine:
+
+q = matmul(x, Wq)
+observe("Q", q)
+
+k = matmul(x, Wk)
+observe("K", k)
+
+scores = matmul(q, transpose(k)) / sqrt(head_dim)
+observe("QK scores", scores)
+
+weights = softmax(scores)
+observe("attention", weights)
+
+y = matmul(weights, v)
+observe("attention output", y)
+
+The UI could now produce:
+
+Transformer Attention
+
+  Input
+    │
+    ▼
+  Q ─────────┐
+             │
+  K ───────► QKᵀ
+                │
+                ▼
+             scaling
+                │
+                ▼
+              mask
+                │
+                ▼
+             softmax
+                │
+                ▼
+         attention weights
+                │
+                ▼
+               × V
+                │
+                ▼
+             output
+
+And the user clicks Next.
+
+Each state becomes visible.
+
+Do not build a special Transformer visualizer
+
+This is where I would intentionally diverge from tlmGPT.
+
+Its implementation has explicit structures like:
+
+tokEmb
+posEmb
+q
+k
+v
+att
+attnOut
+hpre
+hact
+mlpOut
+logits
+probs
+
+stored specifically for visualizing its GPT execution.
+
+Instead, MLPL should discover those because the program labels them.
+
+For example:
+
+observe("token embeddings", token_emb)
+observe("positional embeddings", pos_emb)
+observe("residual stream", x)
+observe("Q", q)
+observe("K", k)
+observe("V", v)
+observe("attention weights", att)
+observe("logits", logits)
+observe("probabilities", probs)
+
+Then the same machinery works for:
+
+transformers
+CNNs
+PCA
+clustering
+regression
+decision trees
+LoRA
+MoE
+Engram
+reinforcement learning
+graph algorithms
+numerical methods
+category theory demos
+
+That is much more consistent with what MLPL is becoming.
+
+Even better: make observe() return its argument
+
+This is a small language/API detail that pays off enormously.
+
+Conceptually:
+
+observe(name, value) -> value
+
+so you can write:
+
+weights =
+    matmul(q, transpose(k))
+    |> softmax
+    |> observe("attention")
+
+or whatever composition syntax MLPL supports best.
+
+The important semantic property is:
+
+observe(x) ≡ x
+
+except for the diagnostic side effect.
+
+That makes it analogous to a functional tap.
+
+You can leave instrumentation in demonstration code without rewriting the algorithm.
+
+There are really three kinds of stepping
+
+I would distinguish them.
+
+1. Concept stepping
+
+Explicit educational checkpoints:
+
+observe("input", X)
+observe("centered data", Xc)
+observe("covariance", C)
+observe("eigenvectors", E)
+observe("projected data", Z)
+
+This is what most demos should use.
+
+It explains the algorithm.
+
+2. Training stepping
+
+Iteration/epoch level:
+
+train 100 {
+    ...
+
+    metric("loss", step, loss)
+
+    if mod(step, 10) == 0 {
+        emit_frame("boundary", step, predictions)
+    }
+}
+
+Then the UI gets:
+
+Step   ◀ ───────●────────────────── ▶
+        0       37                100
+
+Loss
+   │\
+   │ \
+   │  \__
+   │     \____
+   └─────────────
+
+Decision Boundary
+
+       ○ ○ ○
+    ○ ○▓▓●●
+      ▓▓●●●
+    ▓▓●●●●
+
+The existing live-loss/SSE infrastructure means you already have part of this plumbing. Your changelog shows a live loss panel and server-side visualization transport are already present.
+
+3. Interpreter stepping
+
+This is the debugger-like version:
+
+Step 17
+
+source:
+→ weights = softmax(scores)
+
+variables:
+scores    [8,8]
+weights   [8,8]
+
+last operation:
+softmax [8,8] → [8,8]
+
+Useful eventually, but I would not start here.
+
+It teaches MLPL execution rather than ML concepts.
+
+Concept stepping is much more valuable initially.
+
+The UI I would add to the existing playground
+
+Your web application currently provides REPL/editor/tutorial/demo functionality.
+
+Add another tab:
+
+REPL | Editor | Tutorial | Explorer
+
+Explorer could have a tlmGPT-like dashboard:
+
+┌─────────────────────────────────────────────────────────────┐
+│ Gradient Descent                              Step 17 / 100  │
+├────────────────┬─────────────────────────┬──────────────────┤
+│ MLPL source    │ Main visualization      │ State            │
+│                │                         │                  │
+│ x = ...        │       loss surface      │ loss      .183   │
+│ y = ...        │                         │ lr        .01    │
+│                │        •                │ grad norm .54    │
+│ → w = ...      │       ↙                 │                  │
+│                │    •                    │ w [2]            │
+│                │  ↙                      │ grad [2]         │
+├────────────────┴─────────────────────────┴──────────────────┤
+│ |◀   ◀    ▶    ▶|        ●──────────────────────────────    │
+│                  Step 17                                   │
+└─────────────────────────────────────────────────────────────┘
+
+Notice something important:
+
+the dashboard isn't coded for gradient descent.
+
+The .mlpl file determines what appears.
+
+A small visualization descriptor would solve this elegantly
+
+Perhaps a demo can include metadata.
+
+Something conceptually like:
+
+viz:layout("Gradient Descent", [
+    ["surface", "loss"],
+    ["line", "loss_history"],
+    ["vector", "parameters"],
+    ["vector", "gradient"]
+])
+
+I wouldn't necessarily make viz: special syntax.
+
+Could simply be library functions.
+
+For example:
+
+viz = dashboard([
+    panel("Loss", :line, "loss"),
+    panel("Landscape", :surface, "surface"),
+    panel("Parameters", :heatmap, "weights")
+])
+
+But I'd resist designing much of this initially.
+
+You can infer a surprisingly good default visualization from shape.
+
+Shape-directed visualization
+
+This fits sw-MLPL exceptionally well because arrays are central to the language.
+
+For an observed value:
+
+Shape/type	Default representation
+scalar	numeric card
+[n]	line/bar
+[n,2]	scatter
+[h,w]	heatmap
+[h,w,3]	image
+[batch,class]	probability matrix
+token IDs	token strip
+attention [heads,t,t]	head selector + heatmap
+weights [in,out]	heatmap
+gradient same shape	diverging heatmap
+[n,3]	3-D scatter
+loss history	line graph
+
+Then users can override it:
+
+observe_as("weights", W, "heatmap")
+
+Most demos don't need renderer-specific code at all.
+
+Where Rust should end
+
+I would put approximately these things in core/Rust:
+
+VizValue
+Observation
+Frame
+FrameSet
+Timeline
+Renderer trait
+SVG renderers
+browser transport
+SSE frame transport
+frame storage
+play/pause/seek controls
+
+Maybe:
+
+struct Observation {
+    name: String,
+    step: u64,
+    value: Value,
+    hint: Option<VizHint>,
+}
+
+and:
+
+struct Frame {
+    step: u64,
+    observations: Vec<Observation>,
+}
+
+That's about it.
+
+No:
+
+TransformerVisualizer
+PcaVisualizer
+AdamVisualizer
+KMeansVisualizer
+
+Those belong in MLPL.
+
+First demos I would build
+
+There is a very natural progression.
+
+Phase 1 — linear regression
+
+This might be the best proof of concept.
+
+Show:
+
+data points
+    ↓
+prediction line
+    ↓
+residuals
+    ↓
+loss
+    ↓
+gradient
+    ↓
+parameter update
+
+Allow:
+
+[Previous] [Next] [Play]
+
+epoch 12 / 100
+
+Visualize the line converging.
+
+This validates the complete stepping architecture with almost no ML complexity.
+
+Phase 2 — gradient descent in 2-D
+
+You already have a loss_landscape() helper with trajectory overlay support.
+
+So this is almost begging to become interactive:
+
+                   loss
+                    ▲
+                 ╱╲
+               ╱    ╲
+             ╱   •₀   ╲
+           ╱      ↘     ╲
+          ─────────•₁──────
+                    ↘
+                      •₂
+                        ↘
+                          ★
+
+Slider:
+
+iteration: 0 ─────────●──── 100
+
+Compare:
+
+SGD
+Momentum
+Adam
+
+That could be an exceptionally good ML teaching demo.
+
+Phase 3 — tiny neural network
+
+Use something deliberately tiny:
+
+2 input
+  ↓
+3 hidden
+  ↓
+2 output
+
+At each step display:
+
+input
+weights
+pre-activation
+activation
+logits
+softmax
+loss
+
+Then switch to backward mode:
+
+dLoss
+dW2
+dh
+dW1
+
+The UI could have:
+
+Forward → | ← Backward
+
+This would explain backpropagation extraordinarily well.
+
+Phase 4 — attention
+
+Now reproduce the strongest parts of tlmGPT.
+
+Start with a sentence:
+
+the cat sat on the mat
+
+Then:
+
+tokens
+↓
+token IDs
+↓
+embeddings
+↓
+Q K V
+↓
+QKᵀ
+↓
+scale
+↓
+causal mask
+↓
+softmax
+↓
+attention
+↓
+weighted V
+
+Your language already exposes attention_weights, and the documentation already mentions an attention overlay visualization.
+
+So this should not require a new transformer implementation.
+
+A particularly good visualization: matrix multiplication
+
+Because sw-MLPL is array-oriented, I think you should go further down than tlmGPT.
+
+For:
+
+C = matmul(A, B)
+
+show:
+
+           B
+         ┌───────┐
+         │       │
+         └───────┘
+             ▲
+             │ column j
+
+A  ┌───────┐       C
+   │ row i │ ───► [ i,j ]
+   └───────┘
+
+ A[i,:] · B[:,j]
+
+Then step through individual elements.
+
+This directly connects:
+
+array programming
+        ↓
+linear algebra
+        ↓
+neural networks
+
+and makes sw-MLPL itself easier to learn.
+
+PCA would make an outstanding visualization demo
+
+You already have pca.mlpl.
+
+Turn it into:
+
+Original points
+
+       •
+    •     •
+       •
+ •             •
+        •
+          •
+
+
+Center
+
+       •
+    •     •
+       +
+ •             •
+        •
+
+
+Principal axes
+
+       •
+    •  ╱  •
+      ╱
+ •───+──────────•
+    ╱   •
+
+
+Projection
+
+────────•──•─•────•──•─────
+
+Then eventually:
+
+2-D → 1-D
+3-D → 2-D
+embedding cloud → PCA/UMAP
+
+This leads directly into your earlier embedding/RAG visualization ideas.
+
+K-means is similarly perfect
+
+Animate:
+
+1. initial centroids
+2. assign points
+3. move centroids
+4. repeat
+
+with the user able to stop after each half-step.
+
+The algorithm itself stays ordinary MLPL.
+
+centroids = init(...)
+
+for step in range(10) {
+    labels = assign(X, centroids)
+    observe("assign", labels)
+
+    centroids = update(X, labels)
+    observe("centroids", centroids)
+}
+
+That's exactly the sort of demo that demonstrates why this architecture is general.
+
+Then tackle tiny GPT
+
+Instead of duplicating tlmGPT, use your existing tiny LM:
+
+demos/tiny_lm.mlpl
+
+sw-MLPL already has enough functionality for tokenization, embeddings, causal attention, cross entropy, generation and attention visualization.
+
+A future demo could look like:
+
+                Tiny Transformer Explorer
+
+Tokens
+────────────────────────────────
+ t  h  e  ·  c  a  t
+
+Embeddings                   Attention
+┌──────────────────┐        ┌──────────────────┐
+│░▒░░▓▒...         │        │█                 │
+│▒░▓▒░░...         │        │▒█                │
+│...               │        │▒▓█               │
+└──────────────────┘        └──────────────────┘
+
+Transformer
+embedding → attention → MLP → logits
+                ▲
+
+Next token
+────────────────────────────────
+"sat"             41.3%
+"is"              18.7%
+"was"              9.8%
+
+Loss
+────────────────────────────────
+╲
+ ╲
+  ╲______
+
+So visually it can reach or exceed tlmGPT, but the architecture is much more interesting:
+
+The dashboard visualizes an actual MLPL program.
+
+There is another major opportunity: "Explain this tensor"
+
+Clicking an observation ought to bring up an inspector.
+
+For example:
+
+attention_weights
+
+shape:
+    [heads=4, query=12, key=12]
+
+rank:
+    3
+
+range:
+    0.0000 .. 0.8217
+
+mean:
+    0.0833
+
+row sums:
+    ≈ 1.0
+
+Interpretation:
+    For each attention head and query token,
+    this tensor contains the probability assigned
+    to every permitted key token.
+
+The named-axis feature of MLPL is particularly valuable here. Your language already carries labeled dimensions through operations and reports structured shape mismatches.
+
+Python ML teaching tools normally lose this semantic information.
+
+MLPL could exploit it.
+
+This becomes a forcing function for the language
+
+That's another reason I strongly favor the demo-repo approach.
+
+Every demo exposes missing language capabilities.
+
+For example:
+
+Linear regression
+
+Might expose missing:
+
+vector annotation
+frame emission
+plot composition
+Backprop
+
+Might expose missing:
+
+gradient introspection
+parameter introspection
+graph traversal
+Attention
+
+Might expose missing:
+
+named-axis operations
+slicing
+masking visualization
+LoRA
+
+Might expose missing:
+
+model parameter replacement
+low-rank decomposition inspection
+MoE
+
+Might expose missing:
+
+routing statistics
+sparse gather/scatter visualization
+Engram
+
+This could be especially interesting given that sw-MLPL already contains engram, apply_engram, and detailed engram_stats.
+
+You could visualize:
+
+tokens
+   ↓
+n-gram hashes
+   ↓
+┌──────────────────────── memory table ────────────────────┐
+│       █                           █                       │
+│                 █                                         │
+│                                       █                   │
+└───────────────────────────────────────────────────────────┘
+         ↑ hit          ↑ collision
+
+             ↓
+          retrieved rows
+             ↓
+             gate
+             ↓
+        residual stream
+
+That might actually be more novel than another transformer visualization.
+
+I would add only a few core primitives
+
+Rather than adding ten visualization builtins, something roughly like this would suffice:
+
+observe(name, x)
+observe_as(name, x, kind)
+
+frame(step)
+metric(name, step, value)
+
+You may already be able to evolve emit_frame() rather than introducing all of these.
+
+And perhaps:
+
+explain(name, text)
+
+for educational annotations.
+
+Then a demo might literally be:
+
+X = ...
+observe("training data", X)
+
+W = ...
+
+for step in range(100) {
+    pred = matmul(X, W)
+    loss = mse(pred, y)
+
+    metric("loss", step, loss)
+
+    g = grad(loss, W)
+
+    observe("prediction", pred)
+    observe("gradient", g)
+
+    W = W - 0.01 * g
+
+    frame(step)
+}
+
+That's extremely attractive as teaching code because the visualization markup doesn't obscure the algorithm.
+
+One subtle but important feature: rewind without recomputation
+
+I'd store the observations produced during execution:
+
+Frame 0
+  X
+  W
+  prediction
+  gradient
+  loss
+
+Frame 1
+  ...
+
+Frame 2
+  ...
+
+The browser can then scrub them afterward.
+
+For small educational models this is cheap.
+
+For large data:
+
+full
+sampled
+summary
+delta
+
+could be storage policies.
+
+For example:
+
+observe_as("weights", W, "sampled-heatmap")
+
+But don't optimize this early.
+
+Tiny teaching models make full snapshots practical.
+
+Eventually: compare two executions
+
+This would be a killer feature.
+
+For example:
+
+              SGD                  Adam
+
+step          37                   37
+
+loss         .381                 .142
+
+              ●                     ●
+             ↘                      ↓
+        ●                            ●
+      ↘                              ↓
+    ●                                ★
+
+Or:
+
+ReLU                 sigmoid
+
+normal attention     causal attention
+
+full precision       int4
+
+base model           LoRA
+
+transformer          transformer + Engram
+
+Because observations have stable names, the UI can align them automatically.
+
+That gives you an experiment microscope, not merely a graphing package.
+
+Suggested implementation sequence
+
+I would resist the temptation to begin with GPT.
+
+Stage	Work	Mostly
+1	generic frame/observation representation	Rust
+2	browser timeline/play/pause/step	Rust/WASM
+3	expose observe over existing emit_frame mechanism	small core change
+4	linear-regression explorer	MLPL
+5	gradient-descent/loss-landscape explorer	MLPL
+6	K-means	MLPL
+7	PCA	MLPL
+8	MLP forward/backprop	mostly MLPL
+9	attention explorer	MLPL
+10	tiny GPT explorer	MLPL
+11	Engram / LoRA / MoE	MLPL
+
+The first four should prove whether the abstraction is right.
+
+The architectural rule I'd adopt
+
+Rust provides rendering capability; MLPL determines what the visualization means.
+
+In other words:
+
+BAD
+
+Rust:
+    AttentionVisualizer
+    PCAVisualizer
+    KMeansVisualizer
+    GradientDescentVisualizer
+
+
+BETTER
+
+Rust:
+    Timeline
+    Observation
+    TensorInspector
+    LineRenderer
+    ScatterRenderer
+    HeatmapRenderer
+    GraphRenderer
+    SurfaceRenderer
+
+MLPL:
+    attention.mlpl
+    pca.mlpl
+    kmeans.mlpl
+    gradient_descent.mlpl
+
+That also fits the overall sw-MLPL philosophy extremely well: the demo becomes both teaching material and dogfooding/forcing function.
+
+And there is an interesting inversion relative to tlmGPT: tlmGPT demonstrates how GPT works. This project could demonstrate both how GPT works and how an array-oriented ML language expresses GPT. The same infrastructure can then step through practically any ML concept rather than ending at one model architecture.
+
+consider that I have a Rust-based sw-MLPL extension mechanism demo'ed here: 
+sw-ml-study/demo-extensionsand many demo repos  include sw-MLPL libraries 
+https://github.com/orgs/sw-ml-study/repositoriesspecifically 
+sw-ml-study/demo-mlpl-librarieshow should I proceed to generate your mlpl microscope idea?
+
+Given the extension boundary you already proved and the new MLPL-library repository, I would not build the microscope primarily inside sw-mlpl. I would build it as a layered downstream experiment, and only promote the minimal abstractions that prove generally useful.
+
+Your existing repos already encode exactly the separation this needs: demo-extensions is explicitly for capabilities that should not become language-runtime domains, with public MLPL facades over private Rust providers, while demo-mlpl-libraries exists to extract reusable, domain-neutral MLPL modules instead of copying them between demos.
+
+Recommended architecture
+
+I would use four layers:
+
+                       demo-ml-microscope
+                              |
+                 ML concepts / experiments
+                         almost all .mlpl
+                              |
+              +---------------+---------------+
+              |                               |
+      microscope.mlpl                    viz.mlpl
+   stepping / observations          presentation helpers
+              |                               |
+              +------- demo-mlpl-libraries ---+
+                              |
+                    very small native boundary
+                              |
+                     microscope extension
+                              |
+                       demo-extensions
+                              |
+             events / window / GPU / storage
+                              |
+                           Rust
+
+And underneath all of it:
+
+                         sw-mlpl
+                   language + evaluator
+                 arrays / autograd / ML
+                trace / emit_frame / SVG
+
+The rule should be:
+
+Build downward only when the layer above cannot express the requirement cleanly.
+
+That is very consistent with how native3d has evolved: MLPL owns camera behavior, picking, geometry and application logic, while Rust owns the generic native rendering/lifecycle boundary.
+
+1. Create demo-ml-microscope
+
+I now think this deserves its own demo repo.
+
+I prefer:
+
+demo-ml-microscope
+
+over demo-ml-explorer, because "microscope" captures the distinctive capability:
+
+expose internal ML state, stop it, inspect it, move forward/backward and compare it.
+
+It should be an MLPL project, not a Rust project.
+
+Something like:
+
+demo-ml-microscope/
+    README.md
+    AGENTS.md
+    COPYRIGHT
+    LICENSE
+
+    lib/
+        microscope.mlpl
+        layouts.mlpl
+        tensors.mlpl
+        training.mlpl
+
+    demos/
+        01-vector.mlpl
+        02-matmul.mlpl
+        03-linear-regression.mlpl
+        04-gradient-descent.mlpl
+        05-kmeans.mlpl
+        06-pca.mlpl
+        07-mlp-forward.mlpl
+        08-backprop.mlpl
+        09-attention.mlpl
+        10-transformer.mlpl
+        11-tiny-lm.mlpl
+        12-lora.mlpl
+        13-engram.mlpl
+
+    tests/
+        ...
+        
+    vendor/
+        swml/
+            microscope.mlpl
+            ...
+
+Initially, lib/ can contain experimental code.
+
+Once pieces prove generic, move them to demo-mlpl-libraries.
+
+That matches your established "demo as proving ground → promote reusable pieces" pattern.
+
+2. Start with a pure-MLPL microscope library
+
+Before writing any Rust extension at all, determine how far existing sw-MLPL can take you.
+
+You already have the crucial primitive:
+
+emit_frame(name, step, x)
+
+and live scalar metrics/connect-mode transport. The existing language also already supports SVG visualizations, loss landscapes, attention overlays and 3-D plot data.
+
+Build a facade in MLPL around those primitives.
+
+Conceptually:
+
+def u:observe(name, value) {
+    "Record value as the current microscope observation."
+    emit_frame(name, microscope_step, value)
+    value
+}
+
+And:
+
+def u:observe_at(name, step, value) {
+    "Record a named observation at an explicit step."
+    emit_frame(name, step, value)
+    value
+}
+
+Potentially:
+
+def u:checkpoint(label) {
+    "Advance the educational microscope timeline."
+    ...
+}
+
+The exact APIs should be driven by what existing MLPL permits rather than adding syntax prematurely.
+
+3. Separate semantic observation from rendering
+
+This is probably the most important API design decision.
+
+A microscope program should say:
+
+observe("attention scores", scores)
+
+not:
+
+heatmap(scores)
+
+Why?
+
+Because these are different concerns.
+
+The program knows:
+
+these numbers represent attention scores.
+
+The renderer knows:
+
+[T,T] numeric data probably looks useful as a heatmap.
+
+So an observation should logically contain:
+
+name
+value
+step
+optional semantic role
+optional visualization hint
+optional explanation
+
+For example:
+
+Observation
+  name        "attention"
+  role        "attention_weights"
+  shape       [4, 12, 12]
+  step        7
+  value       ...
+  viz_hint    "heatmap"
+
+Most visual choices should be inferred.
+
+4. Put the generic MLPL API in demo-mlpl-libraries
+
+But not immediately.
+
+Develop it inside demo-ml-microscope first.
+
+Once you have two or three unrelated demos using the same functions, extract:
+
+demo-mlpl-libraries/
+    lib/
+        microscope/
+            microscope.mlpl
+
+That repo is specifically intended for domain-neutral reusable MLPL modules and currently uses reproducible source vendoring through include.
+
+A candidate library eventually might expose:
+
+swml/microscope
+
+observe
+observe_as
+checkpoint
+metric
+annotation
+phase
+
+Perhaps also:
+
+swml/viz
+
+auto_plot
+tensor_summary
+normalized_heatmap
+vector_field
+trajectory
+
+But I would keep the first API tiny.
+
+5. Use demo-extensions only for things MLPL cannot do
+
+You already have a very good exemplar in native3d.
+
+demo-extensions currently proves:
+
+dynamic Rust capability
+arrays crossing the ABI
+persistent handles
+records
+lifecycle
+a generic native viewer
+MLPL-owned application logic
+worker/interpreter ↔ main-thread UI via a Port contract.
+
+That's almost exactly the infrastructure needed by a richer microscope UI.
+
+So I would add, experimentally:
+
+extensions/microscope/
+
+or possibly make it part of native3d initially if the UI shares its window/event machinery.
+
+But I lean toward a separate capability:
+
+_native_microscope
+
+with an MLPL facade:
+
+microscope
+
+because a microscope isn't fundamentally 3-D.
+
+What should the Rust microscope extension do?
+
+Very little semantically.
+
+Something along these lines:
+
+_microscope.open(...)
+_microscope.push_frame(...)
+_microscope.poll_event(...)
+_microscope.close(...)
+
+Maybe:
+
+_microscope.set_layout(...)
+
+But even layout should remain as data where practical.
+
+The Rust side should understand generic concepts like:
+
+window
+panel
+timeline
+tensor
+line plot
+scatter plot
+heatmap
+text
+selection
+mouse/key events
+
+It should not understand:
+
+attention
+transformer
+K-means
+PCA
+LoRA
+Engram
+gradient descent
+
+Those are MLPL concepts.
+
+6. The Port model from native3d is probably reusable
+
+This may save you substantial architectural work.
+
+Your existing native3d extension already keeps winit/wgpu on the main thread, runs MLPL on a worker, and exchanges owned event/scene values through the Port contract.
+
+That's the right shape for an interactive microscope too:
+
+          MLPL worker
+              |
+         Observation
+              |
+              v
+        microscope port
+              |
+              v
+         UI main thread
+       winit / wgpu / etc
+              |
+         interaction
+              |
+      Next / Previous /
+     click / select / scrub
+              |
+              v
+        microscope port
+              |
+              v
+          MLPL worker
+
+So rather than inventing another application lifecycle system, reuse the native3d architecture.
+
+You may eventually discover that what you really have is a more generic:
+
+native-app
+
+or:
+
+interactive-viz
+
+extension underneath both.
+
+That would be a good later refactor.
+
+Not phase one.
+
+7. But browser support changes the architecture
+
+The native extension won't work in pure WASM browser execution.
+
+So I would define the microscope protocol above the renderer.
+
+Think:
+
+                 microscope.mlpl
+                       |
+                 frame protocol
+                       |
+        +--------------+--------------+
+        |                             |
+ browser microscope              native microscope
+ sw-mlpl web UI                    extension
+        |                             |
+      DOM/SVG                    winit/wgpu
+
+The same MLPL demonstration can therefore execute:
+
+Browser
+emit_frame(...)
+      ↓
+WASM host collects frame
+      ↓
+Explorer tab renders it
+Native
+observe(...)
+      ↓
+native microscope facade
+      ↓
+extension / Port
+      ↓
+wgpu UI
+
+This is a much better architecture than coupling ML demos to an extension.
+
+The frame protocol should therefore belong upstream eventually
+
+This is one of the few pieces I could imagine promoting into sw-mlpl.
+
+You already effectively have a primitive version with emit_frame.
+
+Rather than immediately adding five builtins, I would first determine whether you can formalize the existing event into something like:
+
+FrameEvent {
+    channel
+    step
+    value
+}
+
+Then consumers decide what to do with it.
+
+Longer term perhaps:
+
+VizEvent =
+    Metric
+  | Frame
+  | Annotation
+  | Phase
+
+But resist overdesign.
+
+8. Don't implement rewind in the evaluator
+
+At first, "rewind" should mean:
+
+browse previously emitted observations.
+
+Not:
+
+roll the interpreter backward.
+
+That's vastly simpler.
+
+A run produces:
+
+Frame 0
+Frame 1
+Frame 2
+Frame 3
+...
+
+and the UI holds them.
+
+Then:
+
+◀ Previous
+▶ Next
+▶▶ Play
+slider
+
+doesn't control execution at all.
+
+It's just reviewing recorded history.
+
+That gives you 80% of the educational value for perhaps 10% of the complexity.
+
+9. Only later add interactive execution control
+
+Once recorded playback works well, add a handshake.
+
+For example:
+
+checkpoint("after QK transpose")
+
+could emit:
+
+Checkpoint {
+    id: 17,
+    label: ...
+}
+
+and pause until the host responds:
+
+Continue
+
+Then you can genuinely step the computation.
+
+But I would not make this a language construct initially.
+
+It can be a library/extension interaction.
+
+Conceptually:
+
+u:step("QK scores", scores)
+
+might do:
+
+observe(...)
+wait_for_continue()
+return scores
+
+Native mode can block/wait through the Port mechanism.
+
+Browser mode might eventually need async/evaluator continuation support, which is a bigger upstream change.
+
+So recorded playback comes first.
+
+10. The first PoC should have zero new Rust
+
+I would explicitly set this constraint:
+
+Milestone 1 must be implemented entirely using existing sw-MLPL functionality.
+
+Build:
+
+demo-ml-microscope/demos/gradient-descent.mlpl
+
+Use existing:
+
+arrays
+autograd
+loss landscape
+SVG
+emit_frame
+metrics
+
+Your current visualization surface already includes loss_landscape(surface,dims,path), designed specifically to display an optimizer trajectory.
+
+So the first microscope could simply emit:
+
+loss
+parameters
+gradient
+trajectory
+
+each iteration.
+
+If that isn't compelling, don't build infrastructure yet.
+
+11. Second PoC: matrix multiplication
+
+Then prove the abstraction is not specific to training.
+
+For:
+
+C = matmul(A, B)
+
+create educational checkpoints:
+
+A
+B
+selected row
+selected column
+products
+partial sums
+result
+
+Something approximately:
+
+observe("A", A)
+observe("B", B)
+
+row = ...
+col = ...
+
+observe("row", row)
+observe("column", col)
+
+products = row * col
+observe("products", products)
+
+result = reduce_add(products)
+observe("dot product", result)
+
+Now you've proven the microscope handles a concept progression, not merely epoch telemetry.
+
+12. Third PoC: K-means
+
+This proves discrete multi-phase iteration.
+
+Each iteration has:
+
+assignment phase
+centroid-update phase
+
+So the timeline becomes:
+
+0 initial
+1 assign
+2 update
+3 assign
+4 update
+...
+
+That forces the frame model to support named phases cleanly.
+
+13. Fourth PoC: backprop
+
+This is where the idea becomes much more interesting.
+
+For a tiny MLP:
+
+Forward:
+
+X
+↓
+W1
+↓
+z1
+↓
+activation
+↓
+W2
+↓
+logits
+↓
+loss
+
+Backward:
+
+dLoss
+↓
+dW2
+↓
+dh
+↓
+dW1
+
+The microscope timeline can move forward through the actual forward/backward arrays.
+
+This will likely expose any missing gradient-introspection capability.
+
+If so, that is exactly the kind of forcing function that can justify a small sw-mlpl addition.
+
+14. Then attention / tiny GPT
+
+Only after those.
+
+At that point you know the generic framework works.
+
+The attention demo should be just ordinary MLPL code:
+
+tokens
+embedding
+positional encoding
+Q
+K
+V
+scores
+mask
+attention probabilities
+weighted values
+output
+logits
+
+You already have enough transformer primitives to execute a tiny LM and inspect attention.
+
+So the microscope adds observation, not another transformer implementation.
+
+15. Then test Engram—which may be the strongest sw-MLPL-specific showcase
+
+The language currently exposes Engram construction, forward application, frozen n-gram hashing, and detailed statistics including addressed rows, unique rows, collisions and gate values.
+
+That enables a microscope demo that is harder to find elsewhere:
+
+input tokens
+       ↓
+n-gram windows
+       ↓
+hash
+       ↓
+memory addresses
+       ↓
+collisions
+       ↓
+rows retrieved
+       ↓
+projection
+       ↓
+gate
+       ↓
+residual update
+
+This would showcase not merely generic ML education but something sw-MLPL is uniquely positioned to inspect.
+
+Repo responsibilities
+
+I would formalize them this way.
+
+Repository	Responsibility
+sw-mlpl	generic evaluator/trace/frame plumbing only
+demo-extensions	experiment with native UI/render/event capabilities
+demo-mlpl-libraries	reusable MLPL microscope/viz helpers after extraction
+demo-ml-microscope	ML educational content and forcing-function experiments
+other demo-* repos	consume microscope library when useful
+
+That means do not put attention.mlpl in the library repo.
+
+Libraries contain mechanisms.
+
+Microscope contains lessons/applications.
+
+Development flow between the repos
+
+I would use a promotion pipeline:
+
+demo-ml-microscope
+        |
+        | repeated useful MLPL code
+        v
+demo-mlpl-libraries
+        |
+        | cannot be expressed adequately in MLPL
+        v
+demo-extensions
+        |
+        | truly language-wide capability
+        v
+sw-mlpl
+
+That's a useful governance rule.
+
+It avoids adding speculative core features.
+
+It also preserves the purpose of your demo ecosystem as a set of forcing functions.
+
+Concrete initial API
+
+I would start much smaller than my previous answer.
+
+Something like:
+
+u:observe(name, value)
+u:observe_as(name, kind, value)
+u:metric(name, step, value)
+
+Maybe:
+
+u:note(text)
+
+And that's it.
+
+No layouts yet.
+
+No declarative dashboard DSL yet.
+
+No phase() until a demo clearly wants it.
+
+No debugger integration.
+
+No reverse execution.
+
+A possible observation naming convention
+
+Nested semantic names could make the UI organize itself without introducing record metadata:
+
+observe("forward/input", X)
+observe("forward/linear1/pre", z1)
+observe("forward/linear1/post", h1)
+
+observe("backward/output/gradient", dy)
+observe("backward/linear1/dW", dW1)
+
+Then the UI can automatically group:
+
+Forward
+  Input
+  Linear1
+    Pre
+    Post
+
+Backward
+  Output
+    Gradient
+  Linear1
+    dW
+
+That is cheap, expressive and doesn't require a new value type.
+
+I would experiment with this before adding structured metadata.
+
+Frame boundaries
+
+You need one convention for grouping observations.
+
+The cleanest starting point is likely the existing step argument.
+
+So:
+
+observe_at("loss", step, loss)
+observe_at("weights", step, W)
+observe_at("gradient", step, g)
+
+all form one logical frame.
+
+For concept demos where "step" isn't naturally numeric:
+
+0 input
+1 center
+2 covariance
+3 eigensystem
+4 projection
+
+The human-readable label could temporarily be another observation:
+
+note(...)
+
+or a small string-valued channel.
+
+Data volume policy
+
+Keep it simple initially:
+
+tiny educational tensor → retain completely
+large tensor            → reject / warn
+
+Later add policies such as:
+
+sample
+summary
+histogram
+slice
+top-k
+
+Do not silently downsample at first.
+
+For a teaching tool, fidelity is more important than scalability.
+
+A useful extension experiment
+
+Once the pure-MLPL version exists, I would add this in demo-extensions:
+
+extensions/microscope-viewer
+
+Its only purpose initially:
+
+Accept a pre-recorded sequence of named tensor frames and let the user browse them interactively.
+
+That separates rendering from execution.
+
+Input might conceptually be:
+
+Frame[]
+
+Output/event stream:
+
+Next
+Previous
+SelectObservation
+SelectHead
+SelectSlice
+Close
+
+No pause/resume MLPL execution yet.
+
+That should be a relatively safe extension experiment given the existing native3d infrastructure.
+
+It may eventually consume native3d
+
+Not all microscope views need 3-D, but some absolutely will:
+
+PCA 3-D
+embedding clouds
+loss surfaces
+model atlas
+optimization landscapes
+tensor geometry
+
+So the native microscope shouldn't replace your native3d work.
+
+It could reuse:
+
+native3d camera
+native3d picking
+native3d line/point geometry
+
+Those helpers already exist as reusable MLPL library functionality in demo-mlpl-libraries.
+
+That's another reason not to build one giant microscope extension.
+
+What I would do first, in order
+Milestone 0 — write the design contract
+
+In the new demo-ml-microscope repo:
+
+docs/architecture.md
+
+Freeze one principle:
+
+MLPL owns concepts and application semantics. Hosts render observations and manage interaction.
+
+And explicitly forbid ML-specific Rust renderer types.
+
+Milestone 1 — pure MLPL recorded microscope
+
+No new core.
+
+No extension.
+
+Use existing emit_frame() and current browser/connect functionality.
+
+Implement:
+
+gradient-descent.mlpl
+matmul.mlpl
+
+Acceptance criterion:
+
+One execution produces enough structured state to replay the learning progression.
+
+Milestone 2 — reusable microscope.mlpl
+
+Extract common observation helpers.
+
+Still inside microscope repo.
+
+Add mlplunit tests.
+
+Use in three independent demos.
+
+Milestone 3 — extract to demo-mlpl-libraries
+
+Once the API stabilizes:
+
+lib/microscope/
+
+Install it into demo-ml-microscope using the vendoring/locking mechanism already documented by that repository.
+
+Now you've proven your MLPL library mechanism on a serious cross-repo use case.
+
+Milestone 4 — browser Explorer
+
+Then alter sw-mlpl web code only enough to consume the generic emitted frame protocol.
+
+Add:
+
+REPL | Editor | Tutorial | Explorer
+
+The Explorer understands observations and tensors, not ML algorithms.
+
+Milestone 5 — native viewer extension
+
+Prototype in demo-extensions.
+
+Reuse your existing Port/main-thread/native lifecycle.
+
+Again, native viewer knows generic:
+
+frame
+tensor
+chart
+timeline
+event
+
+not GPT.
+
+Milestone 6 — serious ML demos
+
+Now build:
+
+K-means
+PCA
+MLP forward
+backprop
+attention
+tiny LM
+Engram
+LoRA
+
+At this point they'll be testing the language itself.
+
+One architectural refinement from my previous answer
+
+I previously suggested:
+
+observe()
+checkpoint()
+frame()
+metric()
+
+I would now be more conservative because of the infrastructure you already have.
+
+Start by treating:
+
+emit_frame()
+
+as the assembly language of the microscope.
+
+Build nicer semantics as MLPL library functions.
+
+Only if that becomes awkward should sw-mlpl acquire anything new.
+
+That puts the burden of proof in exactly the right place.
+
+The resulting system is more interesting than tlmGPT
+
+tlmGPT essentially says:
+
+Here is a beautifully instrumented implementation of one tiny GPT.
+
+Your architecture could say:
+
+Here is an ML language in which any program can expose its own computation as inspectable data, and the same microscope can visualize linear algebra, optimization, clustering, neural networks, transformers, Engram, and future algorithms.
+
+And because the teaching algorithm itself remains .mlpl, someone can:
+
+open demo
+read MLPL
+change MLPL
+rerun
+inspect changed computation
+
+That is the differentiating feature I would optimize for.
+
+The microscope should not merely explain ML. It should make MLPL programs explain themselves.
+

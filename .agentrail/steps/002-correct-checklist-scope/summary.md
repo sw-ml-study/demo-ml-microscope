@@ -1,0 +1,1 @@
+Corrected checklist scope per user: this MLPL repository no longer invokes or requires sw-checklist; README, AGENTS, saga acceptance, and checks now use MLPL/documentation gates. The demo-extensions handoff explicitly requires sw-checklist only for its planned Rust work. Committed and pushed as 12a3d0e.

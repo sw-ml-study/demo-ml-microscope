@@ -1,8 +1,9 @@
 number = 3
 slug = "measured-emit-frame-contract"
-status = "in-progress"
+status = "completed"
 description = "Use TDD to establish native mlplunit and tool-selection infrastructure, then ..."
 role = "legacy"
 context_files = []
 created_at = "2026-09-01T19:35:43"
-commits = []
+completed_at = "2026-09-01T19:44:30"
+commits = ["843a5362a4e3de0db45bd5c555a9f8be7c011ba8"]

@@ -15,6 +15,7 @@ upstream request yet.
 | Static visual evidence | SVG plots, heatmaps, scatter, curves, landscapes | lesson fallback and README assets |
 | Browser/WASM and connect transport | current web evaluator and frame trace code | future generic host substrate |
 | First concept timeline | MM01 live SSE matches eight committed observations grouped over five steps | Rust/Yew integration fixture |
+| Iterative training timeline | LR01 retains predictions, residuals, loss, explicit gradients, parameters, and trajectory at five checkpoints | generic playback and chart planning |
 
 ## Awkward but apparently expressible
 
@@ -25,7 +26,7 @@ upstream request yet.
 | Recorded playback | SSE carries all frames, but browser `frame_trace` retains only the latest per generation | local bounded SSE recorder/static view |
 | Shape-directed view selection | host can inspect shape but producer hint semantics are not frozen | infer defaults in downstream viewer contract |
 | Large observation policy | no microscope-specific total frame/byte contract is established | tiny values; reject rather than silently sample |
-| Gradient introspection | general autograd exists, but exact intermediate/parameter surfaces need probes | tiny explicit models and focused tests |
+| Gradient introspection | LR01 proves explicit analytic gradients; general autograd intermediate/parameter surfaces still need probes | later tiny-backprop lesson |
 
 ## Not yet demonstrated / candidate blockers
 

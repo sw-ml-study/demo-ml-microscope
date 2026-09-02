@@ -6,6 +6,7 @@ catalog="$repo_root/catalog/lessons.toml"
 
 grep -q '^schema = "sw-ml-study.ml-microscope-lessons"$' "$catalog"
 grep -q '^id = "MM01"$' "$catalog"
+grep -q '^id = "LR01"$' "$catalog"
 
 for path in demos/matrix_microscope.mlpl tests/test_matrix_microscope.mlpl \
     assets/previews/matrix-microscope.svg fixtures/yew/matrix-run-v0.json; do
@@ -16,4 +17,15 @@ for path in demos/matrix_microscope.mlpl tests/test_matrix_microscope.mlpl \
     [ -f "$repo_root/$path" ] || { echo "catalog target missing: $path" >&2; exit 1; }
 done
 
-echo "PASS lesson catalog references runnable MM01 artifacts"
+for path in demos/linear_regression_microscope.mlpl \
+    tests/test_linear_regression_microscope.mlpl \
+    assets/previews/linear-regression-microscope.svg \
+    fixtures/yew/linear-regression-run-v0.json; do
+    grep -q "\"$path\"" "$catalog" || {
+        echo "catalog does not reference $path" >&2
+        exit 1
+    }
+    [ -f "$repo_root/$path" ] || { echo "catalog target missing: $path" >&2; exit 1; }
+done
+
+echo "PASS lesson catalog references runnable MM01 and LR01 artifacts"

@@ -32,6 +32,18 @@ matrix-fixture:
 matrix-recording:
     ./scripts/run-matrix-recording
 
+# Run the linear-regression microscope and check its SVG preview.
+regression:
+    ./scripts/run-regression-demo
+
+# Validate the committed Rust/Yew regression recording fixture.
+regression-fixture:
+    ./scripts/check-regression-recording
+
+# Prove live regression SSE matches the committed recording.
+regression-recording:
+    ./scripts/run-regression-recording
+
 # Run the complete precommit gate.
 check:
     ./scripts/check

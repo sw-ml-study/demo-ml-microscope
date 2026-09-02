@@ -1,0 +1,50 @@
+# Explicit two-parameter linear-regression state and bounded training helpers.
+
+def u:regression_inputs_valid(features, labels, parameters) {
+  "Return one when samples are nonempty matched vectors and parameters hold slope and bias.";
+  eq(rank(features), 1) * eq(rank(labels), 1) * eq(rank(parameters), 1) * gt(tally(features), 0) * eq(tally(features), tally(labels)) * eq(tally(parameters), 2)
+}
+
+def u:regression_state(features, labels, parameters) {
+  "Compute predictions, residuals, mean squared loss, and analytic slope/bias gradients.";
+  if u:regression_inputs_valid(features, labels, parameters) {
+    slope = take(parameters, 0, 0);
+    bias = take(parameters, 0, 1);
+    predictions = features * slope + bias;
+    residuals = predictions - labels;
+    sample_count = tally(features);
+    loss = reduce_add(residuals * residuals) / sample_count;
+    slope_gradient = 2 * reduce_add(residuals * features) / sample_count;
+    bias_gradient = 2 * reduce_add(residuals) / sample_count;
+    ok({predictions: predictions, residuals: residuals, loss: loss, gradient: [slope_gradient, bias_gradient]})
+  } else {
+    err({kind: "regression_shape", features: shape(features), labels: shape(labels), parameters: shape(parameters)})
+  }
+}
+
+def u:regression_update(parameters, gradient, learning_rate) {
+  "Apply one checked gradient-descent update to slope and bias.";
+  if eq(rank(parameters), 1) * eq(tally(parameters), 2) * eq(rank(gradient), 1) * eq(tally(gradient), 2) * eq(rank(learning_rate), 0) * gt(learning_rate, 0) {
+    ok(parameters - learning_rate * gradient)
+  } else {
+    err({kind: "regression_update", parameters: shape(parameters), gradient: shape(gradient)})
+  }
+}
+
+def u:regression_train(features, labels, initial_parameters, learning_rate, steps) {
+  "Run a bounded integer number of explicit analytic-gradient updates and return final state.";
+  valid_steps = eq(rank(steps), 0) * eq(steps, floor(steps)) * (1 - lt(steps, 0));
+  if valid_steps {
+    parameters = initial_parameters;
+    index = 0;
+    while lt(index, steps) {
+      state = u:regression_state(features, labels, parameters)?;
+      parameters = u:regression_update(parameters, state.gradient, learning_rate)?;
+      index = index + 1
+    };
+    final = u:regression_state(features, labels, parameters)?;
+    ok({parameters: parameters, predictions: final.predictions, residuals: final.residuals, loss: final.loss, gradient: final.gradient})
+  } else {
+    err({kind: "regression_steps", steps: steps})
+  }
+}

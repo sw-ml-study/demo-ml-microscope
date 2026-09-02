@@ -60,6 +60,24 @@ See [graphics and animation options](docs/graphics-options.md) for the Yew,
 CSS, SVG, GIF, WebP, video, native-renderer, README, and accessibility decisions,
 including exact commands for viewing the current deliverable.
 
+## Gradient descent microscope
+
+LR01 exposes an entire two-parameter learning loop: predictions, residuals,
+mean squared loss, analytic gradient, parameters, and trajectory. Eight updates
+fit four exact points on `y=2x+1`; five bounded checkpoints are retained for
+playback.
+
+![Linear regression data and fitted line beside falling loss and the parameter trajectory](assets/previews/linear-regression-microscope.svg)
+
+```sh
+just regression             # run MLPL and check the generated visual
+just regression-recording   # prove live SSE equals the Yew fixture
+```
+
+Read the [LR01 lesson guide](docs/linear-regression-microscope.md), the
+[standalone MLPL source](demos/linear_regression_microscope.mlpl), or the
+[recording fixture](fixtures/yew/linear-regression-run-v0.json).
+
 Only after those share a stable observation vocabulary will the project move
 through MLP forward/backward state, PCA, attention, a tiny language model,
 LoRA, and Engram. Existing sw-MLPL model and visualization primitives remain

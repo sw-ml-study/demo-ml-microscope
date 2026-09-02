@@ -12,3 +12,15 @@ recording = "fixtures/yew/matrix-run-v0.json"
 steps = 5
 observations = 8
 status = "accepted"
+
+[[lesson]]
+id = "LR01"
+slug = "linear-regression"
+title = "Gradient descent fits slope and bias"
+source = "demos/linear_regression_microscope.mlpl"
+test = "tests/test_linear_regression_microscope.mlpl"
+preview = "assets/previews/linear-regression-microscope.svg"
+recording = "fixtures/yew/linear-regression-run-v0.json"
+steps = 5
+observations = 32
+status = "accepted"

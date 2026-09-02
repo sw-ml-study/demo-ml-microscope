@@ -30,10 +30,14 @@ Accepted: MM01 emits eight literal observations over five steps, derives the
 exact 2-by-2 result, checks native `matmul` parity, generates a freshness-checked
 SVG, and matches the committed budgeted Yew fixture over live SSE.
 
-## Queued: linear-regression timeline
+## Completed: linear-regression timeline
 
 Implement bounded deterministic linear regression with prediction, residual,
 loss, gradient, parameter, and trajectory observations.
+
+Accepted: LR01 performs eight explicit analytic-gradient updates, retains five
+checkpoints with 32 observations, reduces MSE from 21 below 0.0004, generates a
+freshness-checked SVG, and matches its bounded Yew fixture over live SSE.
 
 ## Queued: K-means phases
 

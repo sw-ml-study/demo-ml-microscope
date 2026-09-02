@@ -1,0 +1,42 @@
+# Linear-regression microscope explicit-gradient contract.
+include "lib/linear_regression_microscope.mlpl";
+
+@test {name: "regression state exposes predictions residuals loss and gradients", tags: ["regression", "microscope"]}
+def u:test_regression_initial_state() {
+  "Pin the exact first forward and gradient calculation for y equals two x plus one.";
+  state = u:regression_state([0, 1, 2, 3], [1, 3, 5, 7], [0, 0])?;
+  u:assert_eq(state.predictions, [0, 0, 0, 0], "initial predictions")?;
+  u:assert_eq(state.residuals, [-1, -3, -5, -7], "initial residuals")?;
+  u:assert_eq(state.loss, 21, "initial mean squared loss")?;
+  u:assert_eq(state.gradient, [-17, -8], "analytic gradient")
+}
+
+@test {name: "one gradient step lowers exact fixture loss", tags: ["regression", "gradient-descent"]}
+def u:test_regression_first_step() {
+  "Verify one analytic-gradient update and its independently recomputed loss.";
+  initial = u:regression_state([0, 1, 2, 3], [1, 3, 5, 7], [0, 0])?;
+  parameters = u:regression_update([0, 0], initial.gradient, 0.1)?;
+  next = u:regression_state([0, 1, 2, 3], [1, 3, 5, 7], parameters)?;
+  u:assert_approx(parameters, [1.7, 0.8], 0.000000001, "updated slope and bias")?;
+  u:assert_approx(next.loss, 0.535, 0.000000001, "recomputed next loss")?;
+  u:assert_true(lt(next.loss, initial.loss), "loss did not decrease")
+}
+
+@test {name: "bounded training approaches the known line", tags: ["regression", "convergence"]}
+def u:test_regression_bounded_training() {
+  "Require eight deterministic steps to approach slope two and bias one.";
+  result = u:regression_train([0, 1, 2, 3], [1, 3, 5, 7], [0, 0], 0.1, 8)?;
+  u:assert_true(lt(result.loss, 0.002), "final loss above bound")?;
+  u:assert_approx(result.parameters, [2, 1], 0.06, "known line parameters")
+}
+
+@test {name: "regression helpers reject invalid shapes and budgets", tags: ["regression", "errors"]}
+def u:test_regression_boundaries() {
+  "Reject mismatched samples, wrong parameter shape, empty data, and invalid step counts.";
+  u:assert_true(is_err(u:regression_state([0, 1], [1], [0, 0])), "sample mismatch accepted")?;
+  u:assert_true(is_err(u:regression_state([], [], [0, 0])), "empty data accepted")?;
+  u:assert_true(is_err(u:regression_state([0], [1], [0])), "wrong parameters accepted")?;
+  u:assert_true(is_err(u:regression_train([0], [1], [0, 0], 0.1, -1)), "negative steps accepted")
+}
+
+u:run_registered_tests()

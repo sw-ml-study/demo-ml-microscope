@@ -1,0 +1,24 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+mlpl=$($repo_root/scripts/select-mlpl)
+tmp_dir=$(mktemp -d)
+
+cleanup() {
+    rm -rf -- "$tmp_dir"
+}
+trap cleanup EXIT HUP INT TERM
+
+"$mlpl" --source-dir "$repo_root" --svg-out "$tmp_dir" \
+    "$repo_root/demos/linear_regression_microscope.mlpl"
+
+generated=$(find "$tmp_dir" -maxdepth 1 -type f -name '*.svg' -print)
+[ -n "$generated" ] || { echo "regression lesson did not produce SVG" >&2; exit 1; }
+count=$(printf '%s\n' "$generated" | wc -l | tr -d ' ')
+[ "$count" -eq 1 ] || { echo "regression lesson produced $count SVG files" >&2; exit 1; }
+cmp -s "$generated" "$repo_root/assets/previews/linear-regression-microscope.svg" || {
+    echo "regression preview is stale; regenerate it from the lesson" >&2
+    exit 1
+}
+echo "PASS regression lesson numeric contract and preview freshness"

@@ -288,6 +288,9 @@ source. Do not create a duplicate `CLAUDE.md`.
 - Run `agentrail complete` only after the implementation commit and successful
   gate. If completion changes durable metadata, commit and push those exact
   files separately, then make no further source changes.
+- At the end of every Agentrail step, summarize what was completed, checks run,
+  commit/push status, what the next step will deliver, and explicit blockers or
+  limitations (`none` when there are none).
 
 Planning references: `docs/research.txt`, `docs/architecture.md`,
 `docs/plan.md`, `docs/sagas.md`, `docs/cross-repo-handoffs.md`, and

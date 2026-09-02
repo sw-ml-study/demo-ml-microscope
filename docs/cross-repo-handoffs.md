@@ -39,6 +39,12 @@ The first immutable integration inputs are
 should pin the source revision and run the equivalent of `just matrix-recording`
 against its parser/reducer acceptance test.
 
+The second integration input is
+`fixtures/yew/linear-regression-run-v0.json`. It forces the generic Yew client
+to handle nonconsecutive retained steps, scalar and vector observations,
+repeated semantic names, loss plotting, and a three-value trajectory point
+without adding regression-specific Rust types.
+
 The extension agent should:
 
 1. create a Yew WASM application that connects to the existing sw-MLPL session

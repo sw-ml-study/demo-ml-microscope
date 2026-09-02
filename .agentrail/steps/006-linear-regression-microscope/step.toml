@@ -1,6 +1,6 @@
 number = 6
 slug = "linear-regression-microscope"
-status = "pending"
+status = "in-progress"
 description = "Build the second visible microscope lesson using TDD: a bounded deterministic..."
 role = "legacy"
 context_files = []

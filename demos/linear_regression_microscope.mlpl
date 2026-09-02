@@ -1,0 +1,67 @@
+# Standalone analytic-gradient linear-regression microscope.
+
+print("WHAT THIS SHOWS -- Gradient descent changes slope and bias to reduce prediction residuals and mean squared loss.");
+print("DATA -- x=[0,1,2,3], y=[1,3,5,7], whose exact line is y=2x+1.");
+print("NUMERICAL CONTRACT -- Eight updates use the explicit MSE gradient with learning rate 0.1.");
+
+def u:lr_state(features, labels, parameters) {
+  "Compute predictions, residuals, mean squared loss, and analytic slope/bias gradients.";
+  slope = take(parameters, 0, 0);
+  bias = take(parameters, 0, 1);
+  predictions = features * slope + bias;
+  residuals = predictions - labels;
+  sample_count = tally(features);
+  loss = reduce_add(residuals * residuals) / sample_count;
+  slope_gradient = 2 * reduce_add(residuals * features) / sample_count;
+  bias_gradient = 2 * reduce_add(residuals) / sample_count;
+  {predictions: predictions, residuals: residuals, loss: loss, gradient: [slope_gradient, bias_gradient]}
+}
+
+def u:linear_regression_visual() {
+  "Render initial and fitted lines, shrinking residuals, loss descent, and parameter trajectory.";
+  "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 600\" width=\"1000\" height=\"600\" role=\"img\"><title>Linear regression gradient descent microscope</title><desc>Four exact data points are compared with the initial zero line and fitted line. Residual bars shrink, loss falls from twenty-one toward zero, and slope and bias approach two and one over eight updates.</desc><style>text{font-family:ui-monospace,monospace;fill:#dbeafe}.panel{fill:#172033;stroke:#52627a;stroke-width:2}.axis{stroke:#64748b;stroke-width:2}.target{stroke:#22c55e;stroke-width:4}.initial{stroke:#64748b;stroke-width:3;stroke-dasharray:8 7}.point{fill:#fbbf24;stroke:#0b1020;stroke-width:2}.loss{fill:none;stroke:#f472b6;stroke-width:4}.path{fill:none;stroke:#60a5fa;stroke-width:4}.muted{fill:#a5b4fc}.good{fill:#86efac}</style><rect width=\"1000\" height=\"600\" fill=\"#0b1020\"/><text x=\"34\" y=\"38\" font-size=\"24\">LINEAR REGRESSION MICROSCOPE — predictions → residuals → gradient → update</text><rect class=\"panel\" x=\"30\" y=\"70\" width=\"455\" height=\"330\" rx=\"14\"/><text x=\"52\" y=\"104\" font-size=\"19\">MODEL SPACE</text><line class=\"axis\" x1=\"80\" y1=\"350\" x2=\"440\" y2=\"350\"/><line class=\"axis\" x1=\"80\" y1=\"350\" x2=\"80\" y2=\"135\"/><line class=\"initial\" x1=\"80\" y1=\"350\" x2=\"440\" y2=\"350\"/><line class=\"target\" x1=\"80\" y1=\"320\" x2=\"440\" y2=\"140\"/><circle class=\"point\" cx=\"80\" cy=\"320\" r=\"7\"/><circle class=\"point\" cx=\"200\" cy=\"260\" r=\"7\"/><circle class=\"point\" cx=\"320\" cy=\"200\" r=\"7\"/><circle class=\"point\" cx=\"440\" cy=\"140\" r=\"7\"/><text class=\"muted\" x=\"100\" y=\"378\">gray: step 0, y=0</text><text class=\"good\" x=\"270\" y=\"378\">green: fitted ≈ 2x+1</text><rect class=\"panel\" x=\"515\" y=\"70\" width=\"455\" height=\"330\" rx=\"14\"/><text x=\"537\" y=\"104\" font-size=\"19\">LOSS AND PARAMETER UPDATES</text><line class=\"axis\" x1=\"555\" y1=\"350\" x2=\"930\" y2=\"350\"/><line class=\"axis\" x1=\"555\" y1=\"350\" x2=\"555\" y2=\"135\"/><polyline class=\"loss\" points=\"555,145 602,322 649,340 696,344 743,346 790,347 837,348 884,349 930,349\"/><text class=\"muted\" x=\"575\" y=\"170\">loss 21</text><text class=\"good\" x=\"840\" y=\"330\">loss &lt; 0.002</text><polyline class=\"path\" points=\"555,520 620,443 690,421 748,410 798,402 840,396 875,391 905,387 930,384\"/><circle class=\"point\" cx=\"555\" cy=\"520\" r=\"7\"/><circle class=\"point\" cx=\"930\" cy=\"384\" r=\"7\"/><text x=\"555\" y=\"552\">parameters [w,b]: [0,0] → approximately [2,1]</text><rect class=\"panel\" x=\"30\" y=\"430\" width=\"455\" height=\"125\" rx=\"14\"/><text x=\"52\" y=\"466\">EACH RECORDED STEP</text><text class=\"muted\" x=\"52\" y=\"500\">parameters · predictions · residuals</text><text class=\"muted\" x=\"52\" y=\"530\">loss · analytic gradient · trajectory point</text><text class=\"muted\" x=\"500\" y=\"585\">Exact arrays and assertions are authoritative; animation replays these retained states.</text></svg>"
+}
+
+features = emit_frame("regression/data/features", 0, [0, 1, 2, 3]);
+labels = emit_frame("regression/data/labels", 0, [1, 3, 5, 7]);
+parameters = [0, 0];
+learning_rate = 0.1;
+step = 0;
+loss_history = [];
+parameter_history = fill([0, 2], 0);
+
+while lt(step, 9) {
+  state = u:lr_state(features, labels, parameters);
+  recorded_step = lt(step, 3) + eq(step, 4) + eq(step, 8);
+  if recorded_step {
+    emit_frame("regression/model/parameters", step, parameters);
+    emit_frame("regression/model/predictions", step, state.predictions);
+    emit_frame("regression/model/residuals", step, state.residuals);
+    emit_frame("regression/training/loss", step, state.loss);
+    emit_frame("regression/training/gradient", step, state.gradient);
+    emit_frame("regression/trajectory/point", step, [take(parameters, 0, 0), take(parameters, 0, 1), state.loss])
+  } else {
+    0
+  };
+  loss_history = concat(loss_history, reshape(state.loss, [1]));
+  parameter_history = concat(parameter_history, reshape(parameters, [1, 2]), 0);
+  if lt(step, 8) {
+    parameters = parameters - learning_rate * state.gradient
+  } else {
+    parameters = parameters
+  };
+  step = step + 1
+};
+
+final = u:lr_state(features, labels, parameters);
+disp(loss_history);
+disp(parameter_history);
+print("HOW TO READ IT -- Predictions move toward labels, residuals and gradients shrink, and [slope,bias] approaches [2,1].");
+print("BOUNDARY -- This is full-batch analytic-gradient MSE on four exact points, not stochastic training or a general convergence proof.");
+
+contract = eq(tally(loss_history), 9) * lt(final.loss, 0.002) * reduce_mul(lt(abs(parameters - [2, 1]), 0.06));
+if contract {
+  u:linear_regression_visual()
+} else {
+  err("linear regression microscope contract failed")
+}

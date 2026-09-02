@@ -1,0 +1,22 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+fixture="$repo_root/fixtures/yew/linear-regression-run-v0.json"
+
+jq -e '
+  def product: reduce .[] as $value (1; . * $value);
+  .schema == "sw-ml-study.ml-microscope-recording" and
+  .version == 0 and
+  .lesson == "linear-regression" and
+  (.frames | length) <= .budgets.max_frames and
+  ([.frames[].observations | length] | max) <= .budgets.max_observations_per_frame and
+  ([.frames[].observations[].values | length] | max) <= .budgets.max_values_per_observation and
+  ([.frames[].observations[].values | length] | add) <= .budgets.max_total_values and
+  (all(.frames[].observations[]; (.shape | product) == (.values | length))) and
+  ([.frames[].step] == [0, 1, 2, 4, 8]) and
+  (.frames[0].observations[] | select(.name == "regression/training/loss") | .values[0]) == 21 and
+  (.frames[-1].observations[] | select(.name == "regression/training/loss") | .values[0]) < 0.002
+' "$fixture" >/dev/null
+
+echo "PASS regression Yew fixture schema, shapes, checkpoints, convergence, and budgets"

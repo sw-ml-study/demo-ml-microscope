@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+fixture="$repo_root/fixtures/yew/kmeans-run-v0.json"
+
+jq -e '
+  def product: reduce .[] as $value (1; . * $value);
+  .schema == "sw-ml-study.ml-microscope-recording" and
+  .version == 0 and
+  .lesson == "kmeans-phases" and
+  (.frames | length) <= .budgets.max_frames and
+  ([.frames[].observations | length] | max) <= .budgets.max_observations_per_frame and
+  ([.frames[].observations[].values | length] | max) <= .budgets.max_values_per_observation and
+  ([.frames[].observations[].values | length] | add) <= .budgets.max_total_values and
+  (all(.frames[].observations[]; (.shape | product) == (.values | length))) and
+  ([.frames[].step] == [0, 1, 2, 3, 4]) and
+  ([.frames[1].observations[].name] == ["kmeans/assignment/squared_distances", "kmeans/assignment/labels", "kmeans/assignment/objective"]) and
+  ([.frames[2].observations[].name] == ["kmeans/update/centroids", "kmeans/update/counts", "kmeans/update/delta"]) and
+  (.frames[1].observations[] | select(.name == "kmeans/assignment/objective") | .values[0]) == 24 and
+  (.frames[3].observations[] | select(.name == "kmeans/assignment/objective") | .values[0]) < 10.667 and
+  (.frames[4].observations[] | select(.name == "kmeans/update/delta") | .values) == [0, 0, 0, 0]
+' "$fixture" >/dev/null
+
+echo "PASS K-means Yew fixture schema, phase groups, shapes, convergence, and budgets"

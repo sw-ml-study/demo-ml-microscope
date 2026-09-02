@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+fixture="$repo_root/fixtures/yew/kmeans-run-v0.json"
+actual=$($repo_root/scripts/capture-kmeans-recording)
+
+if [ "$(printf '%s' "$actual" | jq -S -c .)" != "$(jq -S -c . "$fixture")" ]; then
+    echo "live K-means recording differs from committed Yew fixture" >&2
+    exit 1
+fi
+
+echo "PASS live K-means SSE recording matches the Yew integration fixture"

@@ -1,6 +1,6 @@
 number = 8
 slug = "kmeans-phase-microscope"
-status = "pending"
+status = "in-progress"
 description = "Build the third visible microscope lesson using TDD: deterministic bounded tw..."
 role = "legacy"
 context_files = []

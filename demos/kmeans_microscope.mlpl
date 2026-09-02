@@ -1,0 +1,91 @@
+# Standalone deterministic two-cluster K-means phase microscope.
+
+print("WHAT THIS SHOWS -- K-means alternates nearest-centroid assignment and centroid-mean update phases.");
+print("DATA -- Six fixed 2-D points form two separated groups; ties choose the lower cluster index.");
+print("NUMERICAL CONTRACT -- Two bounded updates converge and reduce the squared-distance objective from 24 to 32/3.");
+
+def u:kmeans_assign(points, centroids) {
+  "Return labels, both squared distances, and the chosen-distance objective.";
+  labels = [];
+  distances = fill([0, 2], 0);
+  objective = 0;
+  index = 0;
+  while lt(index, take(shape(points), 0, 0)) {
+    point = take(points, 0, index);
+    delta_zero = point - take(centroids, 0, 0);
+    delta_one = point - take(centroids, 0, 1);
+    distance_zero = reduce_add(delta_zero * delta_zero);
+    distance_one = reduce_add(delta_one * delta_one);
+    label = if gt(distance_zero, distance_one) {
+      1
+    } else {
+      0
+    };
+    chosen = if label {
+      distance_one
+    } else {
+      distance_zero
+    };
+    labels = concat(labels, reshape(label, [1]));
+    distances = concat(distances, reshape([distance_zero, distance_one], [1, 2]), 0);
+    objective = objective + chosen;
+    index = index + 1
+  };
+  {labels: labels, squared_distances: distances, objective: objective}
+}
+
+def u:kmeans_mean_update(points, labels) {
+  "Average the fixture points assigned to each of the two nonempty clusters.";
+  sums = [0, 0, 0, 0];
+  counts = [0, 0];
+  index = 0;
+  while lt(index, tally(labels)) {
+    label = take(labels, 0, index);
+    point = take(points, 0, index);
+    sums = scatter(sums, label * 2, take(sums, 0, label * 2) + take(point, 0, 0));
+    sums = scatter(sums, label * 2 + 1, take(sums, 0, label * 2 + 1) + take(point, 0, 1));
+    counts = scatter(counts, label, take(counts, 0, label) + 1);
+    index = index + 1
+  };
+  count_zero = take(counts, 0, 0);
+  count_one = take(counts, 0, 1);
+  {centroids: [[take(sums, 0, 0) / count_zero, take(sums, 0, 1) / count_zero], [take(sums, 0, 2) / count_one, take(sums, 0, 3) / count_one]], counts: counts}
+}
+
+def u:kmeans_visual() {
+  "Render the fixed points, centroid movement, phase timeline, and objective decrease.";
+  "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 620\" width=\"1000\" height=\"620\" role=\"img\"><title>K-means assignment and update microscope</title><desc>Six points split into two clusters. Initial centroids at zero zero and ten ten move to two-thirds two-thirds and eight and two-thirds. A five-frame timeline separates assignment from update, and the objective falls from twenty-four to ten and two-thirds.</desc><style>text{font-family:ui-monospace,monospace;fill:#dbeafe}.panel{fill:#172033;stroke:#52627a;stroke-width:2}.axis{stroke:#64748b;stroke-width:2}.a{fill:#60a5fa}.b{fill:#f472b6}.old{fill:none;stroke:#fbbf24;stroke-width:4}.new{fill:#fbbf24;stroke:#0b1020;stroke-width:2}.move{stroke:#fbbf24;stroke-width:3;stroke-dasharray:7 6;marker-end:url(#arrow)}.phase{fill:#24314a;stroke:#64748b}.active{fill:#1d4ed8;stroke:#93c5fd}.muted{fill:#a5b4fc}.good{fill:#86efac}</style><defs><marker id=\"arrow\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"#fbbf24\"/></marker></defs><rect width=\"1000\" height=\"620\" fill=\"#0b1020\"/><text x=\"34\" y=\"40\" font-size=\"24\">K-MEANS MICROSCOPE — assign → update → assign → converge</text><rect class=\"panel\" x=\"30\" y=\"70\" width=\"540\" height=\"390\" rx=\"14\"/><text x=\"52\" y=\"105\" font-size=\"19\">2-D POINTS AND CENTROID MOVEMENT</text><line class=\"axis\" x1=\"85\" y1=\"410\" x2=\"525\" y2=\"410\"/><line class=\"axis\" x1=\"85\" y1=\"410\" x2=\"85\" y2=\"145\"/><circle class=\"a\" cx=\"105\" cy=\"390\" r=\"8\"/><circle class=\"a\" cx=\"105\" cy=\"342\" r=\"8\"/><circle class=\"a\" cx=\"185\" cy=\"390\" r=\"8\"/><circle class=\"b\" cx=\"425\" cy=\"198\" r=\"8\"/><circle class=\"b\" cx=\"425\" cy=\"150\" r=\"8\"/><circle class=\"b\" cx=\"505\" cy=\"198\" r=\"8\"/><circle class=\"old\" cx=\"105\" cy=\"390\" r=\"13\"/><circle class=\"old\" cx=\"505\" cy=\"150\" r=\"13\"/><line class=\"move\" x1=\"105\" y1=\"390\" x2=\"132\" y2=\"374\"/><line class=\"move\" x1=\"505\" y1=\"150\" x2=\"452\" y2=\"182\"/><rect class=\"new\" x=\"124\" y=\"366\" width=\"16\" height=\"16\"/><rect class=\"new\" x=\"444\" y=\"174\" width=\"16\" height=\"16\"/><text class=\"muted\" x=\"105\" y=\"438\">circles: points · rings: initial · squares: updated means</text><rect class=\"panel\" x=\"600\" y=\"70\" width=\"370\" height=\"390\" rx=\"14\"/><text x=\"622\" y=\"105\" font-size=\"19\">EXACT PHASE EVIDENCE</text><text class=\"muted\" x=\"622\" y=\"145\">initial centroids</text><text x=\"622\" y=\"172\">[[0,0], [10,10]]</text><text class=\"muted\" x=\"622\" y=\"212\">assignment labels</text><text x=\"622\" y=\"239\">[0,0,0,1,1,1]</text><text class=\"muted\" x=\"622\" y=\"279\">updated centroids</text><text x=\"622\" y=\"306\">[[2/3,2/3], [26/3,26/3]]</text><text class=\"muted\" x=\"622\" y=\"346\">objective</text><text class=\"good\" x=\"622\" y=\"375\">24 → 32/3 (converged)</text><text x=\"622\" y=\"420\">tie rule: equal distance → cluster 0</text><rect class=\"phase\" x=\"30\" y=\"500\" width=\"165\" height=\"60\" rx=\"10\"/><rect class=\"active\" x=\"220\" y=\"500\" width=\"165\" height=\"60\" rx=\"10\"/><rect class=\"phase\" x=\"410\" y=\"500\" width=\"165\" height=\"60\" rx=\"10\"/><rect class=\"active\" x=\"600\" y=\"500\" width=\"165\" height=\"60\" rx=\"10\"/><rect class=\"phase\" x=\"790\" y=\"500\" width=\"180\" height=\"60\" rx=\"10\"/><text x=\"57\" y=\"537\">0 · INITIAL</text><text x=\"243\" y=\"537\">1 · ASSIGN</text><text x=\"439\" y=\"537\">2 · UPDATE</text><text x=\"623\" y=\"537\">3 · ASSIGN</text><text x=\"812\" y=\"537\">4 · CONVERGE</text><text class=\"muted\" x=\"30\" y=\"595\">Exact arrays and phase-named observations are authoritative; the generic viewer replays five retained frames.</text></svg>"
+}
+
+points = emit_frame("kmeans/initial/points", 0, [[0, 0], [0, 2], [2, 0], [8, 8], [8, 10], [10, 8]]);
+centroids = emit_frame("kmeans/initial/centroids", 0, [[0, 0], [10, 10]]);
+
+first_assignment = u:kmeans_assign(points, centroids);
+emit_frame("kmeans/assignment/squared_distances", 1, first_assignment.squared_distances);
+emit_frame("kmeans/assignment/labels", 1, first_assignment.labels);
+emit_frame("kmeans/assignment/objective", 1, first_assignment.objective);
+
+first_update = u:kmeans_mean_update(points, first_assignment.labels);
+emit_frame("kmeans/update/centroids", 2, first_update.centroids);
+emit_frame("kmeans/update/counts", 2, first_update.counts);
+emit_frame("kmeans/update/delta", 2, first_update.centroids - centroids);
+
+second_assignment = u:kmeans_assign(points, first_update.centroids);
+emit_frame("kmeans/assignment/squared_distances", 3, second_assignment.squared_distances);
+emit_frame("kmeans/assignment/labels", 3, second_assignment.labels);
+emit_frame("kmeans/assignment/objective", 3, second_assignment.objective);
+
+second_update = u:kmeans_mean_update(points, second_assignment.labels);
+emit_frame("kmeans/update/centroids", 4, second_update.centroids);
+emit_frame("kmeans/update/counts", 4, second_update.counts);
+emit_frame("kmeans/update/delta", 4, second_update.centroids - first_update.centroids);
+
+print("HOW TO READ IT -- Blue assignment frames expose evidence; update frames replace centroids with cluster means.");
+print("BOUNDARY -- This fixed two-cluster fixture proves deterministic phases and convergence, not globally optimal clustering.");
+
+contract = equal(first_assignment.labels, [0, 0, 0, 1, 1, 1]) * equal(second_assignment.labels, first_assignment.labels) * lt(abs(second_assignment.objective - 32 / 3), 0.000000001) * equal(second_update.centroids, first_update.centroids);
+if contract {
+  u:kmeans_visual()
+} else {
+  err("K-means microscope contract failed")
+}

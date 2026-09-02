@@ -1,0 +1,52 @@
+{
+  "schema": "sw-ml-study.ml-microscope-recording",
+  "version": 0,
+  "lesson": "kmeans-phases",
+  "budgets": {
+    "max_frames": 8,
+    "max_observations_per_frame": 4,
+    "max_values_per_observation": 12,
+    "max_total_values": 80
+  },
+  "frames": [
+    {
+      "step": 0,
+      "observations": [
+        {"name": "kmeans/initial/points", "shape": [6, 2], "values": [0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 8.0, 8.0, 8.0, 10.0, 10.0, 8.0]},
+        {"name": "kmeans/initial/centroids", "shape": [2, 2], "values": [0.0, 0.0, 10.0, 10.0]}
+      ]
+    },
+    {
+      "step": 1,
+      "observations": [
+        {"name": "kmeans/assignment/squared_distances", "shape": [6, 2], "values": [0.0, 200.0, 4.0, 164.0, 4.0, 164.0, 128.0, 8.0, 164.0, 4.0, 164.0, 4.0]},
+        {"name": "kmeans/assignment/labels", "shape": [6], "values": [0.0, 0.0, 0.0, 1.0, 1.0, 1.0]},
+        {"name": "kmeans/assignment/objective", "shape": [], "values": [24.0]}
+      ]
+    },
+    {
+      "step": 2,
+      "observations": [
+        {"name": "kmeans/update/centroids", "shape": [2, 2], "values": [0.6666666666666666, 0.6666666666666666, 8.666666666666666, 8.666666666666666]},
+        {"name": "kmeans/update/counts", "shape": [2], "values": [3.0, 3.0]},
+        {"name": "kmeans/update/delta", "shape": [2, 2], "values": [0.6666666666666666, 0.6666666666666666, -1.333333333333334, -1.333333333333334]}
+      ]
+    },
+    {
+      "step": 3,
+      "observations": [
+        {"name": "kmeans/assignment/squared_distances", "shape": [6, 2], "values": [0.8888888888888888, 150.2222222222222, 2.2222222222222223, 119.55555555555554, 2.2222222222222223, 119.55555555555554, 107.55555555555554, 0.8888888888888873, 140.8888888888889, 2.222222222222223, 140.8888888888889, 2.222222222222223]},
+        {"name": "kmeans/assignment/labels", "shape": [6], "values": [0.0, 0.0, 0.0, 1.0, 1.0, 1.0]},
+        {"name": "kmeans/assignment/objective", "shape": [], "values": [10.666666666666668]}
+      ]
+    },
+    {
+      "step": 4,
+      "observations": [
+        {"name": "kmeans/update/centroids", "shape": [2, 2], "values": [0.6666666666666666, 0.6666666666666666, 8.666666666666666, 8.666666666666666]},
+        {"name": "kmeans/update/counts", "shape": [2], "values": [3.0, 3.0]},
+        {"name": "kmeans/update/delta", "shape": [2, 2], "values": [0.0, 0.0, 0.0, 0.0]}
+      ]
+    }
+  ]
+}

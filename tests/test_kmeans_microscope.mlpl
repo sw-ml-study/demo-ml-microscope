@@ -1,0 +1,44 @@
+# K-means assignment, update, tie, convergence, and boundary contract.
+include "lib/kmeans_microscope.mlpl";
+
+@test {name: "kmeans assignment exposes distances labels and objective", tags: ["kmeans", "microscope"]}
+def u:test_kmeans_assignment() {
+  "Pin the initial assignment evidence for two separated three-point clusters.";
+  assignment = u:kmeans_assignment([[0, 0], [0, 2], [2, 0], [8, 8], [8, 10], [10, 8]], [[0, 0], [10, 10]])?;
+  u:assert_eq(assignment.labels, [0, 0, 0, 1, 1, 1], "nearest-centroid labels")?;
+  u:assert_eq(assignment.squared_distances, [[0, 200], [4, 164], [4, 164], [128, 8], [164, 4], [164, 4]], "distance evidence")?;
+  u:assert_eq(assignment.objective, 24, "sum of chosen squared distances")
+}
+
+@test {name: "kmeans ties choose the lower cluster index", tags: ["kmeans", "ties"]}
+def u:test_kmeans_tie_policy() {
+  "Require a point equidistant from both centroids to choose cluster zero.";
+  assignment = u:kmeans_assignment([[5, 5]], [[0, 0], [10, 10]])?;
+  u:assert_eq(assignment.squared_distances, [[50, 50]], "equal distances")?;
+  u:assert_eq(assignment.labels, [0], "lower-index tie policy")
+}
+
+@test {name: "kmeans update converges to exact means", tags: ["kmeans", "convergence"]}
+def u:test_kmeans_convergence() {
+  "Check one mean update and bounded convergence without changing assignments.";
+  points = [[0, 0], [0, 2], [2, 0], [8, 8], [8, 10], [10, 8]];
+  update = u:kmeans_update(points, [0, 0, 0, 1, 1, 1])?;
+  u:assert_eq(update.counts, [3, 3], "cluster counts")?;
+  u:assert_approx(update.centroids, [[2 / 3, 2 / 3], [26 / 3, 26 / 3]], 0.000000001, "cluster means")?;
+  result = u:kmeans_two_cluster(points, [[0, 0], [10, 10]], 4)?;
+  u:assert_true(result.converged, "bounded run did not converge")?;
+  u:assert_eq(result.updates, 2, "convergence update count")?;
+  u:assert_approx(result.objective, 32 / 3, 0.000000001, "converged objective")
+}
+
+@test {name: "kmeans rejects malformed shapes labels empty clusters and budgets", tags: ["kmeans", "errors"]}
+def u:test_kmeans_boundaries() {
+  "Reject non-2-D inputs, invalid labels, empty clusters, and nonpositive update limits.";
+  u:assert_true(is_err(u:kmeans_assignment([0, 1], [[0, 0], [1, 1]])), "rank-one points accepted")?;
+  u:assert_true(is_err(u:kmeans_assignment([[0, 0]], [[0, 0]])), "one centroid accepted")?;
+  u:assert_true(is_err(u:kmeans_update([[0, 0], [1, 1]], [0, 2])), "invalid label accepted")?;
+  u:assert_true(is_err(u:kmeans_update([[0, 0], [1, 1]], [0, 0])), "empty cluster accepted")?;
+  u:assert_true(is_err(u:kmeans_two_cluster([[0, 0]], [[0, 0], [1, 1]], 0)), "zero update budget accepted")
+}
+
+u:run_registered_tests()

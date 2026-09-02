@@ -1,0 +1,107 @@
+# Deterministic bounded two-cluster K-means helpers.
+
+def u:kmeans_inputs_valid(points, centroids) {
+  "Return one for nonempty 2-D points and exactly two 2-D centroids.";
+  if eq(rank(points), 2) * eq(rank(centroids), 2) {
+    point_shape = shape(points);
+    centroid_shape = shape(centroids);
+    gt(take(point_shape, 0, 0), 0) * eq(take(point_shape, 0, 1), 2) * eq(take(centroid_shape, 0, 0), 2) * eq(take(centroid_shape, 0, 1), 2)
+  } else {
+    0
+  }
+}
+
+def u:kmeans_assignment(points, centroids) {
+  "Assign every point to its nearest centroid, choosing cluster zero on an exact tie.";
+  if u:kmeans_inputs_valid(points, centroids) {
+    labels = [];
+    distances = fill([0, 2], 0);
+    objective = 0;
+    index = 0;
+    while lt(index, take(shape(points), 0, 0)) {
+      point = take(points, 0, index);
+      delta_zero = point - take(centroids, 0, 0);
+      delta_one = point - take(centroids, 0, 1);
+      distance_zero = reduce_add(delta_zero * delta_zero);
+      distance_one = reduce_add(delta_one * delta_one);
+      label = if gt(distance_zero, distance_one) {
+        1
+      } else {
+        0
+      };
+      chosen = if label {
+        distance_one
+      } else {
+        distance_zero
+      };
+      labels = concat(labels, reshape(label, [1]));
+      distances = concat(distances, reshape([distance_zero, distance_one], [1, 2]), 0);
+      objective = objective + chosen;
+      index = index + 1
+    };
+    ok({labels: labels, squared_distances: distances, objective: objective})
+  } else {
+    err({kind: "kmeans_shape", points: shape(points), centroids: shape(centroids)})
+  }
+}
+
+def u:kmeans_update(points, labels) {
+  "Average points by binary label, rejecting malformed labels and empty clusters.";
+  valid = if eq(rank(points), 2) * eq(rank(labels), 1) {
+    point_shape = shape(points);
+    gt(take(point_shape, 0, 0), 0) * eq(take(point_shape, 0, 1), 2) * eq(take(point_shape, 0, 0), tally(labels))
+  } else {
+    0
+  };
+  if valid {
+    sums = [0, 0, 0, 0];
+    counts = [0, 0];
+    index = 0;
+    labels_valid = 1;
+    while lt(index, tally(labels)) {
+      label = take(labels, 0, index);
+      label_valid = eq(label, 0) + eq(label, 1);
+      labels_valid = labels_valid * label_valid;
+      if label_valid {
+        point = take(points, 0, index);
+        sums = scatter(sums, label * 2, take(sums, 0, label * 2) + take(point, 0, 0));
+        sums = scatter(sums, label * 2 + 1, take(sums, 0, label * 2 + 1) + take(point, 0, 1));
+        counts = scatter(counts, label, take(counts, 0, label) + 1)
+      } else {
+        0
+      };
+      index = index + 1
+    };
+    if labels_valid * gt(take(counts, 0, 0), 0) * gt(take(counts, 0, 1), 0) {
+      count_zero = take(counts, 0, 0);
+      count_one = take(counts, 0, 1);
+      centroids = [[take(sums, 0, 0) / count_zero, take(sums, 0, 1) / count_zero], [take(sums, 0, 2) / count_one, take(sums, 0, 3) / count_one]];
+      ok({centroids: centroids, counts: counts})
+    } else {
+      err({kind: "kmeans_labels", counts: counts})
+    }
+  } else {
+    err({kind: "kmeans_update_shape", points: shape(points), labels: shape(labels)})
+  }
+}
+
+def u:kmeans_two_cluster(points, initial_centroids, max_updates) {
+  "Run at most max_updates assignment/update phases and report convergence.";
+  valid_updates = eq(rank(max_updates), 0) * eq(max_updates, floor(max_updates)) * gt(max_updates, 0);
+  if valid_updates * u:kmeans_inputs_valid(points, initial_centroids) {
+    centroids = initial_centroids;
+    updates = 0;
+    converged = 0;
+    while lt(updates, max_updates) * (1 - converged) {
+      assignment = u:kmeans_assignment(points, centroids)?;
+      update = u:kmeans_update(points, assignment.labels)?;
+      converged = equal(update.centroids, centroids);
+      centroids = update.centroids;
+      updates = updates + 1
+    };
+    final = u:kmeans_assignment(points, centroids)?;
+    ok({centroids: centroids, labels: final.labels, objective: final.objective, updates: updates, converged: converged})
+  } else {
+    err({kind: "kmeans_budget", max_updates: max_updates})
+  }
+}

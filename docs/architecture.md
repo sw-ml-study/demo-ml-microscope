@@ -47,6 +47,9 @@ full/sample/summary policy exists; hosts must not silently downsample.
 
 ## Interactive UI and published media
 
+The detailed selection, README, export, accessibility, and acceptance guidance
+is in [graphics and animation options](graphics-options.md).
+
 The preferred runtime is the Rust/Yew WASM microscope. Yew owns controls,
 selection, accessible DOM structure, and retained playback; CSS transitions
 may animate state changes inside that application. CSS is presentation only:

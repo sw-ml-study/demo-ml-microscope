@@ -10,7 +10,7 @@ for file in "$repo_dir"/README.md "$repo_dir"/docs/*.md; do
         target=${target%%#*}
         [ -z "$target" ] && continue
         case "$target" in
-            ../*) continue ;;
+            ../*|http://*|https://*) continue ;;
         esac
         base=$(dirname -- "$file")
         if [ ! -e "$base/$target" ]; then

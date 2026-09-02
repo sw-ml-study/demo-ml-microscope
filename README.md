@@ -56,6 +56,10 @@ Read the [MM01 lesson guide](docs/matrix-microscope.md) or inspect the
 [recording fixture](fixtures/yew/matrix-run-v0.json) is the first integration
 input for the planned Rust/Yew viewer in `demo-extensions`.
 
+See [graphics and animation options](docs/graphics-options.md) for the Yew,
+CSS, SVG, GIF, WebP, video, native-renderer, README, and accessibility decisions,
+including exact commands for viewing the current deliverable.
+
 Only after those share a stable observation vocabulary will the project move
 through MLP forward/backward state, PCA, attention, a tiny language model,
 LoRA, and Engram. Existing sw-MLPL model and visualization primitives remain

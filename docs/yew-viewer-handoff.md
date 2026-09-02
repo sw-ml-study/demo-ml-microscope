@@ -7,7 +7,7 @@ implementation.
 ## Pinned producer inputs
 
 Clone or vendor `sw-ml-study/demo-ml-microscope` at commit
-`9ea15cf6ece58752238f2fee799b4ce008a4aa8c`. The machine-readable entry point
+`ff15ec7da2f9055983aa72c43dfe01da92a2d4aa`. The machine-readable entry point
 is [`fixtures/yew/index-v1.json`](../fixtures/yew/index-v1.json). It pins hashes,
 counts, steps, lesson sources, previews, and recordings for:
 

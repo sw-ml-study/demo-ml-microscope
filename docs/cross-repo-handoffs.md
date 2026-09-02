@@ -50,7 +50,7 @@ repeated semantic names, loss plotting, and a three-value trajectory point
 without adding regression-specific Rust types.
 
 The third input is `fixtures/yew/kmeans-run-v0.json` at producer revision
-`9ea15cf6ece58752238f2fee799b4ce008a4aa8c`. It adds alternating assignment and
+`ff15ec7da2f9055983aa72c43dfe01da92a2d4aa`. It adds alternating assignment and
 update prefixes, repeated names, rank-two distance evidence, and a zero final
 delta. The sibling agent should vendor this revision, extend its fixture menu
 and provenance hashes, and demonstrate that existing generic reducer and

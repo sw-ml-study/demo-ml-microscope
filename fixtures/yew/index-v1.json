@@ -3,7 +3,7 @@
   "version": 1,
   "recording_schema": "fixtures/yew/recording-schema-v0.json",
   "source_repository": "https://github.com/sw-ml-study/demo-ml-microscope.git",
-  "source_revision": "9ea15cf6ece58752238f2fee799b4ce008a4aa8c",
+  "source_revision": "ff15ec7da2f9055983aa72c43dfe01da92a2d4aa",
   "fixtures": [
     {
       "id": "MM01",

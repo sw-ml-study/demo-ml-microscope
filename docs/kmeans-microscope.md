@@ -43,7 +43,7 @@ just kmeans-recording   # compare live SSE with the committed recording
 Open the SVG directly or use a Markdown preview. The authoritative interactive
 consumer is the offline Rust/Yew viewer in `../demo-extensions`; its next
 integration should vendor producer revision
-`9ea15cf6ece58752238f2fee799b4ce008a4aa8c` and add KM01 as a third generic
+`ff15ec7da2f9055983aa72c43dfe01da92a2d4aa` and add KM01 as a third generic
 fixture.
 
 ## Claim boundary

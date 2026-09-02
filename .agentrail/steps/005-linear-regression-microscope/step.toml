@@ -1,0 +1,8 @@
+number = 5
+slug = "linear-regression-microscope"
+status = "pending"
+description = "Build the second visible microscope lesson using TDD: a bounded deterministic..."
+role = "legacy"
+context_files = []
+created_at = "2026-09-01T20:20:56"
+commits = []

@@ -1,0 +1,37 @@
+# Standalone matrix-multiplication microscope with literal recorded observations.
+
+print("WHAT THIS SHOWS -- Each output cell is one left row dotted with one right column.");
+print("SHAPES -- A:[row=2,inner=2], B:[inner=2,column=2], C:[row=2,column=2].");
+
+left = emit_frame("matmul/input/left", 0, [[1, 2], [3, 4]]);
+right = emit_frame("matmul/input/right", 0, [[5, 6], [7, 8]]);
+
+active_row = emit_frame("matmul/active/row", 1, [3, 4]);
+active_column = emit_frame("matmul/active/column", 1, [5, 7]);
+products = emit_frame("matmul/active/products", 2, active_row * active_column);
+partial_sums = emit_frame("matmul/active/partial-sums", 3, running_sum(products));
+
+c00 = reduce_add([1, 2] * [5, 7]);
+c01 = reduce_add([1, 2] * [6, 8]);
+c10 = reduce_add(products);
+c11 = reduce_add([3, 4] * [6, 8]);
+derived = emit_frame("matmul/output/derived", 4, [[c00, c01], [c10, c11]]);
+native = emit_frame("matmul/output/native", 4, matmul(left, right));
+
+disp([active_row, active_column, products, partial_sums]);
+disp(derived);
+print("NUMERICAL CONTRACT -- [3,4] * [5,7] gives [15,28]; running sums [15,43] finish C[1,0]=43.");
+print("THE POINT -- The shared inner dimension is consumed; left rows and right columns remain as output axes.");
+print("BOUNDARY -- This exact fixture teaches rank-two multiplication; it does not claim batched matmul.");
+
+def u:matrix_microscope_visual() {
+  "Render the active row, column, products, partial sums, and completed matrix.";
+  "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 960 540\" width=\"960\" height=\"540\" role=\"img\"><title>Matrix multiplication microscope</title><desc>The second row of the left matrix and first column of the right matrix form products fifteen and twenty-eight. Their running sums are fifteen and forty-three, completing the highlighted output cell.</desc><style>text{font-family:ui-monospace,monospace;fill:#dbeafe}.panel{fill:#172033;stroke:#52627a;stroke-width:2}.cell{fill:#0f172a;stroke:#52627a}.row{fill:#2563eb}.column{fill:#16a34a}.active{fill:#db2777}.gold{fill:#fbbf24}.muted{fill:#a5b4fc}</style><rect width=\"960\" height=\"540\" fill=\"#0b1020\"/><text x=\"32\" y=\"38\" font-size=\"23\">MATRIX MICROSCOPE — one output cell under the lens</text><text class=\"muted\" x=\"32\" y=\"66\">A:[row,inner] @ B:[inner,column] → C:[row,column]</text><rect class=\"panel\" x=\"30\" y=\"92\" width=\"260\" height=\"190\" rx=\"14\"/><text x=\"50\" y=\"123\">LEFT A</text><rect class=\"cell\" x=\"65\" y=\"143\" width=\"80\" height=\"48\"/><rect class=\"cell\" x=\"150\" y=\"143\" width=\"80\" height=\"48\"/><rect class=\"row\" x=\"65\" y=\"197\" width=\"80\" height=\"48\"/><rect class=\"row\" x=\"150\" y=\"197\" width=\"80\" height=\"48\"/><text x=\"101\" y=\"174\">1</text><text x=\"186\" y=\"174\">2</text><text x=\"101\" y=\"228\">3</text><text x=\"186\" y=\"228\">4</text><rect class=\"panel\" x=\"350\" y=\"92\" width=\"260\" height=\"190\" rx=\"14\"/><text x=\"370\" y=\"123\">RIGHT B</text><rect class=\"column\" x=\"385\" y=\"143\" width=\"80\" height=\"48\"/><rect class=\"cell\" x=\"470\" y=\"143\" width=\"80\" height=\"48\"/><rect class=\"column\" x=\"385\" y=\"197\" width=\"80\" height=\"48\"/><rect class=\"cell\" x=\"470\" y=\"197\" width=\"80\" height=\"48\"/><text x=\"421\" y=\"174\">5</text><text x=\"506\" y=\"174\">6</text><text x=\"421\" y=\"228\">7</text><text x=\"506\" y=\"228\">8</text><rect class=\"panel\" x=\"670\" y=\"92\" width=\"260\" height=\"190\" rx=\"14\"/><text x=\"690\" y=\"123\">OUTPUT C</text><rect class=\"cell\" x=\"705\" y=\"143\" width=\"80\" height=\"48\"/><rect class=\"cell\" x=\"790\" y=\"143\" width=\"80\" height=\"48\"/><rect class=\"active\" x=\"705\" y=\"197\" width=\"80\" height=\"48\"/><rect class=\"cell\" x=\"790\" y=\"197\" width=\"80\" height=\"48\"/><text x=\"737\" y=\"174\">19</text><text x=\"822\" y=\"174\">22</text><text x=\"737\" y=\"228\">43</text><text x=\"822\" y=\"228\">50</text><rect class=\"panel\" x=\"80\" y=\"320\" width=\"800\" height=\"165\" rx=\"14\"/><text class=\"gold\" x=\"480\" y=\"360\" text-anchor=\"middle\" font-size=\"21\">STEP 1  row [3,4] meets column [5,7]</text><text x=\"480\" y=\"399\" text-anchor=\"middle\" font-size=\"20\">STEP 2  products [3×5, 4×7] = [15,28]</text><text x=\"480\" y=\"438\" text-anchor=\"middle\" font-size=\"20\">STEP 3  partial sums [15,43]</text><text class=\"gold\" x=\"480\" y=\"472\" text-anchor=\"middle\" font-size=\"21\">STEP 4  C[1,0] = 43</text><text class=\"muted\" x=\"480\" y=\"520\" text-anchor=\"middle\">Numeric assertions remain authoritative; color is redundant evidence.</text></svg>"
+}
+
+contract = reduce_mul(eq(derived, [[19, 22], [43, 50]])) * reduce_mul(eq(derived, native)) * reduce_mul(eq(products, [15, 28])) * reduce_mul(eq(partial_sums, [15, 43]));
+if contract {
+  u:matrix_microscope_visual()
+} else {
+  err("matrix microscope contract failed")
+}

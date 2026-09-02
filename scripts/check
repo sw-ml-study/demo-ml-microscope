@@ -9,3 +9,7 @@ repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 "$repo_dir/scripts/run-tests"
 "$repo_dir/scripts/run-emit-frame-errors"
 "$repo_dir/scripts/run-emit-frame-sse"
+"$repo_dir/scripts/run-matrix-demo"
+"$repo_dir/scripts/check-matrix-recording"
+"$repo_dir/scripts/run-matrix-recording"
+"$repo_dir/scripts/check-catalog"

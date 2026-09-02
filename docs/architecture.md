@@ -45,6 +45,34 @@ may override presentation but cannot change the authoritative numeric value.
 Large values must be rejected with a visible budget error until explicit
 full/sample/summary policy exists; hosts must not silently downsample.
 
+## Interactive UI and published media
+
+The preferred runtime is the Rust/Yew WASM microscope. Yew owns controls,
+selection, accessible DOM structure, and retained playback; CSS transitions
+may animate state changes inside that application. CSS is presentation only:
+the reducer's selected run/frame/observation remains authoritative and the UI
+must remain understandable with motion disabled.
+
+Published artifacts serve different purposes:
+
+- A static SVG is the canonical README and documentation fallback. It is
+  compact, accessible, diffable, and derived from the same exact fixture.
+- A short looping GIF is the conservative inline README animation. Generate it
+  from deterministic retained frames, keep it small, and place explanatory alt
+  text and a static SVG nearby.
+- WebM and H.264 MP4 are optional high-quality walkthrough exports for links,
+  releases, issues, and social sharing. They are not acceptance evidence and
+  are not the only route to the lesson.
+- Animated SVG and animated WebP are optional exports. Do not rely on their
+  motion executing in GitHub's sanitized/proxied README rendering.
+- Existing 2-D/native graphics extensions are optional renderers for cases
+  where browser DOM/canvas/SVG is insufficient; they do not replace Yew as the
+  primary microscope or create a second timeline model.
+
+All animation is replay of recorded observations, never a hidden reimplementation
+of the lesson. Respect `prefers-reduced-motion`, provide manual controls, and
+never encode a distinction by motion or color alone.
+
 ## Delivery boundary
 
 This repository implements `.mlpl` lessons, tests, fixtures, observation

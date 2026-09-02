@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+fixture="$repo_root/fixtures/yew/matrix-run-v0.json"
+
+jq -e '
+  def product: reduce .[] as $value (1; . * $value);
+  .schema == "sw-ml-study.ml-microscope-recording" and
+  .version == 0 and
+  (.frames | length) <= .budgets.max_frames and
+  ([.frames[].observations | length] | max) <= .budgets.max_observations_per_frame and
+  ([.frames[].observations[].values | length] | max) <= .budgets.max_values_per_observation and
+  ([.frames[].observations[].values | length] | add) <= .budgets.max_total_values and
+  (all(.frames[].observations[]; (.shape | product) == (.values | length))) and
+  ([.frames[].step] == ([.frames[].step] | sort))
+' "$fixture" >/dev/null
+
+echo "PASS matrix Yew fixture schema, shapes, order, and budgets"

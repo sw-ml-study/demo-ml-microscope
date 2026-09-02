@@ -38,6 +38,24 @@ The first three forcing-function lessons are deliberately different:
 2. linear regression for iterative parameters, gradients, and metrics;
 3. K-means for named assignment/update phases.
 
+## First visual microscope
+
+MM01 is now executable. It follows one output cell from its selected row and
+column through component products and partial sums, then compares the complete
+derived matrix with native `matmul`.
+
+![Matrix multiplication microscope showing the active row, column, products, partial sums, and completed output cell](assets/previews/matrix-microscope.svg)
+
+```sh
+just matrix             # run MLPL and check the generated visual
+just matrix-recording   # prove live SSE equals the Yew fixture
+```
+
+Read the [MM01 lesson guide](docs/matrix-microscope.md) or inspect the
+[standalone MLPL source](demos/matrix_microscope.mlpl). The committed
+[recording fixture](fixtures/yew/matrix-run-v0.json) is the first integration
+input for the planned Rust/Yew viewer in `demo-extensions`.
+
 Only after those share a stable observation vocabulary will the project move
 through MLP forward/backward state, PCA, attention, a tiny language model,
 LoRA, and Engram. Existing sw-MLPL model and visualization primitives remain
@@ -74,10 +92,10 @@ gate for this MLPL repository.
 
 ## Current status
 
-The measured `emit_frame` contract is complete. It proves ordered full-tensor
-SSE events and disconnected identity behavior, while also showing that the
-current browser store retains only the latest frame. The next step is the first
-visible matrix-multiplication microscope. Recorded playback—not reverse
-interpreter execution or pause/resume debugging—is the first target.
+The measured `emit_frame` contract and first visible matrix microscope are
+complete. MM01 emits eight observations across five steps, produces a checked
+SVG, and matches its budgeted Yew fixture over the live SSE path. Recorded
+playback—not reverse interpreter execution or pause/resume debugging—is the
+next UI target.
 
 Copyright (c) 2026 Michael A Wright. Distributed under the [MIT License](LICENSE).

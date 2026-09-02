@@ -1,0 +1,14 @@
+schema = "sw-ml-study.ml-microscope-lessons"
+version = 1
+
+[[lesson]]
+id = "MM01"
+slug = "matrix-multiplication"
+title = "One output cell is one row-column dot"
+source = "demos/matrix_microscope.mlpl"
+test = "tests/test_matrix_microscope.mlpl"
+preview = "assets/previews/matrix-microscope.svg"
+recording = "fixtures/yew/matrix-run-v0.json"
+steps = 5
+observations = 8
+status = "accepted"

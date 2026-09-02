@@ -21,10 +21,14 @@ Accepted: four native mlplunit identity/rank/boundary tests, two public error
 fixtures, and a live loopback SSE probe now run under `just check`. The measured
 contract is in `docs/observation-contract.md`.
 
-## Queued: matrix concept stepping
+## Completed: matrix concept stepping
 
 Implement matrix multiplication in readable MLPL, exposing inputs, row/column,
 products, partial sums, and result while independently asserting the output.
+
+Accepted: MM01 emits eight literal observations over five steps, derives the
+exact 2-by-2 result, checks native `matmul` parity, generates a freshness-checked
+SVG, and matches the committed budgeted Yew fixture over live SSE.
 
 ## Queued: linear-regression timeline
 

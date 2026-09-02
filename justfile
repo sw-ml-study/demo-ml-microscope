@@ -20,6 +20,18 @@ emit-frame-errors:
 emit-frame-sse:
     ./scripts/run-emit-frame-sse
 
+# Run the first visible matrix microscope and check its SVG preview.
+matrix:
+    ./scripts/run-matrix-demo
+
+# Validate the committed Rust/Yew matrix recording fixture.
+matrix-fixture:
+    ./scripts/check-matrix-recording
+
+# Prove the live matrix SSE stream matches the committed recording.
+matrix-recording:
+    ./scripts/run-matrix-recording
+
 # Run the complete precommit gate.
 check:
     ./scripts/check

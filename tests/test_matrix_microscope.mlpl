@@ -1,0 +1,33 @@
+# Matrix microscope row-column derivation contract.
+include "lib/matrix_microscope.mlpl";
+
+@test {name: "matrix cells expose row column products and partial sums", tags: ["matrix", "microscope"]}
+def u:test_matrix_cell_trace() {
+  "Pin the active second-row first-column dot-product evidence.";
+  trace = u:matrix_cell_trace([[1, 2], [3, 4]], [[5, 6], [7, 8]], 1, 0)?;
+  u:assert_eq(trace.row, [3, 4], "selected row")?;
+  u:assert_eq(trace.column, [5, 7], "selected column")?;
+  u:assert_eq(trace.products, [15, 28], "aligned products")?;
+  u:assert_eq(trace.partial_sums, [15, 43], "accumulator states")?;
+  u:assert_eq(trace.value, 43, "completed cell")
+}
+
+@test {name: "derived matrix equals native rank-two matmul", tags: ["matrix", "parity"]}
+def u:test_matrix_derived_parity() {
+  "Cross-check the readable four-dot derivation against native matmul.";
+  left = [[1, 2], [3, 4]];
+  right = [[5, 6], [7, 8]];
+  derived = u:matrix_2x2_product(left, right)?;
+  u:assert_eq(derived, [[19, 22], [43, 50]], "known product")?;
+  u:assert_eq(derived, matmul(left, right), "native parity")
+}
+
+@test {name: "matrix microscope rejects incompatible boundaries", tags: ["matrix", "errors"]}
+def u:test_matrix_boundaries() {
+  "Reject wrong ranks, incompatible inner dimensions, and invalid indices.";
+  u:assert_true(is_err(u:matrix_cell_trace([1, 2], [[1], [2]], 0, 0)), "rank-one left accepted")?;
+  u:assert_true(is_err(u:matrix_cell_trace([[1, 2, 3]], [[1], [2]], 0, 0)), "inner mismatch accepted")?;
+  u:assert_true(is_err(u:matrix_cell_trace([[1, 2]], [[1], [2]], 1, 0)), "invalid row accepted")
+}
+
+u:run_registered_tests()

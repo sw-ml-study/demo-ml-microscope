@@ -14,6 +14,7 @@ upstream request yet.
 | Attention inspection | `attention_weights` returns rank-2 or rank-3 maps | later attention lesson, not new Rust |
 | Static visual evidence | SVG plots, heatmaps, scatter, curves, landscapes | lesson fallback and README assets |
 | Browser/WASM and connect transport | current web evaluator and frame trace code | future generic host substrate |
+| First concept timeline | MM01 live SSE matches eight committed observations grouped over five steps | Rust/Yew integration fixture |
 
 ## Awkward but apparently expressible
 
@@ -45,3 +46,8 @@ A confirmed blocker must add a minimal `.mlpl` reproducer, configured tool
 version/revision, expected signature and semantics, positive/negative/boundary
 acceptance cases, affected lessons, and an explicit currently-unavailable
 result. Until then, no `sw-mlpl` change is requested.
+
+MM01 confirms that none of these limitations blocks the first visual
+microscope: literal names, tiny tensors, exact values, local budgets, and an
+external SSE recorder are sufficient. It does not establish a general protocol
+for annotations, axis labels, eviction, or large tensors.

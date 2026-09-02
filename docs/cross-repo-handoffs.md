@@ -32,6 +32,13 @@ Trigger: this repo has the measured ordered SSE contract plus matrix lesson
 fixtures. Yew/WASM is the preferred full-featured UI; existing native graphics
 support is optional follow-up work.
 
+The first immutable integration inputs are
+`demos/matrix_microscope.mlpl`,
+`fixtures/yew/matrix-run-v0.json`, and
+`assets/previews/matrix-microscope.svg` from this repository. The sibling agent
+should pin the source revision and run the equivalent of `just matrix-recording`
+against its parser/reducer acceptance test.
+
 The extension agent should:
 
 1. create a Yew WASM application that connects to the existing sw-MLPL session
@@ -58,6 +65,10 @@ The extension agent should:
 8. only after the 2-D browser path is accepted, evaluate the existing
    `wgpu`/`winit` support as an optional renderer for 3-D surfaces, PCA clouds,
    or desktop use. Share the protocol/model rather than forking semantics.
+9. export deterministic presentation media from retained frames: static SVG as
+   the canonical fallback, a short GIF for reliable inline README motion, and
+   optional WebM plus H.264 MP4 for higher-quality linked walkthroughs. Treat
+   animated SVG/WebP as optional, never the sole documentation path.
 
 Forbidden Rust concepts include transformer, attention, PCA, K-means, LoRA,
 Engram, optimizer, or lesson-specific viewer types. The first Yew UI records a

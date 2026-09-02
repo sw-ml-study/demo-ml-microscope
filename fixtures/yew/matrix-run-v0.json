@@ -1,0 +1,46 @@
+{
+  "schema": "sw-ml-study.ml-microscope-recording",
+  "version": 0,
+  "lesson": "matrix-multiplication",
+  "budgets": {
+    "max_frames": 8,
+    "max_observations_per_frame": 4,
+    "max_values_per_observation": 16,
+    "max_total_values": 64
+  },
+  "frames": [
+    {
+      "step": 0,
+      "observations": [
+        {"name": "matmul/input/left", "shape": [2, 2], "values": [1.0, 2.0, 3.0, 4.0]},
+        {"name": "matmul/input/right", "shape": [2, 2], "values": [5.0, 6.0, 7.0, 8.0]}
+      ]
+    },
+    {
+      "step": 1,
+      "observations": [
+        {"name": "matmul/active/row", "shape": [2], "values": [3.0, 4.0]},
+        {"name": "matmul/active/column", "shape": [2], "values": [5.0, 7.0]}
+      ]
+    },
+    {
+      "step": 2,
+      "observations": [
+        {"name": "matmul/active/products", "shape": [2], "values": [15.0, 28.0]}
+      ]
+    },
+    {
+      "step": 3,
+      "observations": [
+        {"name": "matmul/active/partial-sums", "shape": [2], "values": [15.0, 43.0]}
+      ]
+    },
+    {
+      "step": 4,
+      "observations": [
+        {"name": "matmul/output/derived", "shape": [2, 2], "values": [19.0, 22.0, 43.0, 50.0]},
+        {"name": "matmul/output/native", "shape": [2, 2], "values": [19.0, 22.0, 43.0, 50.0]}
+      ]
+    }
+  ]
+}

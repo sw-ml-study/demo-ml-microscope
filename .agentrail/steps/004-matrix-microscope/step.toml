@@ -1,6 +1,6 @@
 number = 4
 slug = "matrix-microscope"
-status = "pending"
+status = "in-progress"
 description = "Build the first visible matrix-multiplication microscope in this repository u..."
 role = "legacy"
 context_files = []

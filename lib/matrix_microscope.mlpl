@@ -1,0 +1,52 @@
+# Checked 2-by-2 row-column derivation helpers for the first microscope lesson.
+
+def u:matrix_dimensions(matrix) {
+  "Return row and column counts for a rank-two numeric matrix.";
+  if eq(rank(matrix), 2) {
+    dimensions = shape(matrix);
+    ok({rows: take(dimensions, 0, 0), columns: take(dimensions, 0, 1)})
+  } else {
+    err({kind: "matrix_rank", actual: rank(matrix), expected: 2})
+  }
+}
+
+def u:valid_matrix_index(index, upper_bound) {
+  "Return one for a finite zero-based integer below the supplied bound.";
+  (1 - lt(index, 0)) * lt(index, upper_bound) * eq(index, floor(index))
+}
+
+def u:matrix_cell_trace(left, right, row_index, column_index) {
+  "Expose one checked product cell as its row, column, products, prefix sums, and value.";
+  left_dimensions = u:matrix_dimensions(left)?;
+  right_dimensions = u:matrix_dimensions(right)?;
+  if 1 - eq(left_dimensions.columns, right_dimensions.rows) {
+    err({kind: "inner_dimension", left: shape(left), right: shape(right)})
+  } else {
+    valid = u:valid_matrix_index(row_index, left_dimensions.rows) * u:valid_matrix_index(column_index, right_dimensions.columns);
+    if valid {
+      row = take(left, 0, row_index);
+      column = take(right, 1, column_index);
+      products = row * column;
+      partial_sums = running_sum(products);
+      ok({row: row, column: column, products: products, partial_sums: partial_sums, value: reduce_add(products)})
+    } else {
+      err({kind: "product_index", row: row_index, column: column_index})
+    }
+  }
+}
+
+def u:matrix_2x2_product(left, right) {
+  "Derive one checked 2-by-2 product from four explicit row-column traces.";
+  left_dimensions = u:matrix_dimensions(left)?;
+  right_dimensions = u:matrix_dimensions(right)?;
+  compatible = eq(left_dimensions.rows, 2) * eq(left_dimensions.columns, 2) * eq(right_dimensions.rows, 2) * eq(right_dimensions.columns, 2);
+  if compatible {
+    c00 = u:matrix_cell_trace(left, right, 0, 0)?.value;
+    c01 = u:matrix_cell_trace(left, right, 0, 1)?.value;
+    c10 = u:matrix_cell_trace(left, right, 1, 0)?.value;
+    c11 = u:matrix_cell_trace(left, right, 1, 1)?.value;
+    ok([[c00, c01], [c10, c11]])
+  } else {
+    err({kind: "matrix_2x2_shape", left: shape(left), right: shape(right)})
+  }
+}

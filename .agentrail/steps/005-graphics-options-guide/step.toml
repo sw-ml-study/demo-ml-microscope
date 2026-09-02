@@ -1,9 +1,10 @@
 number = 5
 slug = "graphics-options-guide"
-status = "in-progress"
+status = "completed"
 description = "Document the agreed visualization strategy in docs/graphics-options.md: Yew/W..."
 role = "meta"
 context_files = []
 created_at = "2026-09-01T20:22:13"
+completed_at = "2026-09-01T20:23:32"
 task_type = "documentation"
-commits = []
+commits = ["aa67bd3f1a9b561e21e15c48964a7d4f9f1ba84d"]

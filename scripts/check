@@ -16,3 +16,4 @@ repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 "$repo_dir/scripts/run-regression-demo"
 "$repo_dir/scripts/check-regression-recording"
 "$repo_dir/scripts/run-regression-recording"
+"$repo_dir/scripts/check-yew-handoff"

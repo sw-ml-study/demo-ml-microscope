@@ -44,6 +44,10 @@ regression-fixture:
 regression-recording:
     ./scripts/run-regression-recording
 
+# Validate the pinned cross-repository Rust/Yew implementation handoff.
+yew-handoff:
+    ./scripts/check-yew-handoff
+
 # Run the complete precommit gate.
 check:
     ./scripts/check

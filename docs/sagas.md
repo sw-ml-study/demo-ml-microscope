@@ -1,6 +1,6 @@
 # Saga queue
 
-## Active: foundation contract
+## Completed: foundation contract
 
 Install Agentrail process rules; match peer copyright and MIT license; create
 the README, architecture, plan, ownership handoffs, capability ledger, and
@@ -39,14 +39,24 @@ Accepted: LR01 performs eight explicit analytic-gradient updates, retains five
 checkpoints with 32 observations, reduces MSE from 21 below 0.0004, generates a
 freshness-checked SVG, and matches its bounded Yew fixture over live SSE.
 
-## Queued: K-means phases
+## Completed locally / queued in sibling: Yew interactive viewer handoff
+
+The shared schema, hash-pinned fixture index, two consumer recordings, pure
+model boundaries, reducer semantics, generic views, accessibility behavior,
+native/browser acceptance cases, and build/run/deploy contract are frozen in
+`docs/yew-viewer-handoff.md`.
+
+Next external action: an independently authorized `../demo-extensions` agent
+implements the Rust/Yew app and runs `sw-checklist` there. This repository
+cannot claim interactive playback until that sibling work is delivered.
+
+## Queued after interactive viewer handoff: K-means phases
 
 Implement bounded deterministic K-means assignment/update phases. Use the
 lesson to decide how multiple named observations group into one logical frame.
 
 ## Future
 
-After three lessons: review and hand off a reusable MLPL helper. Then add a
-static recorded viewer, MLP forward/backward, PCA, attention, tiny LM, LoRA,
-and Engram. Browser Explorer and native viewer work remain separate handoffs
-after the protocol is proven.
+After the Yew sibling handoff and third lesson: review and hand off a reusable
+MLPL helper. Then add MLP forward/backward, PCA, attention, tiny LM, LoRA, and
+Engram. Optional native graphics remain a separate renderer handoff.

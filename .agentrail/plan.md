@@ -60,6 +60,11 @@ supported, awkward, and blocked behavior using executable evidence.
 
 ## Saga 2: pure-MLPL proof of concept
 
+After the first two lessons, prioritize the implementation-ready Rust/Yew
+viewer handoff so interactive playback can proceed in `demo-extensions` before
+the K-means lesson. This ordering change does not authorize sibling edits from
+this repository.
+
 1. Implement matrix multiplication as concept stepping: inputs, selected row
    and column, products, partial sums, and completed output.
 2. Implement two-parameter linear regression/gradient descent with data,
@@ -102,16 +107,17 @@ bounded, deterministic, and executable as MLPL.
 
 1. Specify a versioned, renderer-neutral observation/timeline interchange from
    measured artifacts, including budgets and malformed-input behavior.
-2. Hand off a generic prerecorded-frame native viewer to `demo-extensions`,
-   reusing its Port/main-thread/headless architecture where appropriate.
-3. Request the smallest `sw-mlpl` browser Explorer work needed to consume the
-   same protocol: shape-directed cards/charts, grouping, selection, playback,
-   and bounded retention. Add interactive execution control only in a later
-   independently justified saga.
+2. Hand off a full-featured generic Rust/Yew WASM microscope to
+   `demo-extensions`. It consumes ordered SSE frames, owns bounded browser
+   retention and playback, and keeps its parser/reducer headlessly testable.
+3. Keep the existing native graphics path as an optional second renderer for
+   desktop/3-D views, sharing the same observation contract. Request `sw-mlpl`
+   changes only where its server or protocol demonstrably blocks the Yew host;
+   do not add a duplicate core Explorer speculatively.
 4. Add side-by-side execution comparison only after stable observation names
    and retention policies are proven.
 
-Exit: browser and optional native hosts visualize the same MLPL-authored data
+Exit: the Yew browser and optional native hosts visualize the same MLPL-authored data
 without knowing which algorithm produced it.
 
 ## Cross-cutting gates

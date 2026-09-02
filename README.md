@@ -78,6 +78,21 @@ Read the [LR01 lesson guide](docs/linear-regression-microscope.md), the
 [standalone MLPL source](demos/linear_regression_microscope.mlpl), or the
 [recording fixture](fixtures/yew/linear-regression-run-v0.json).
 
+## Interactive viewer status
+
+Interactive playback is now prioritized ahead of the third lesson. This repo
+contains an implementation-ready, revision-pinned
+[Rust/Yew viewer handoff](docs/yew-viewer-handoff.md), shared
+[recording schema](fixtures/yew/recording-schema-v0.json), and checked
+[fixture index](fixtures/yew/index-v1.json). Run:
+
+```sh
+just yew-handoff
+```
+
+The actual Previous/Next/Play/Pause/Seek UI must be implemented by the
+`../demo-extensions` agent; it is not yet available to open from this repo.
+
 Only after those share a stable observation vocabulary will the project move
 through MLP forward/backward state, PCA, attention, a tiny language model,
 LoRA, and Engram. Existing sw-MLPL model and visualization primitives remain
@@ -114,10 +129,9 @@ gate for this MLPL repository.
 
 ## Current status
 
-The measured `emit_frame` contract and first visible matrix microscope are
-complete. MM01 emits eight observations across five steps, produces a checked
-SVG, and matches its budgeted Yew fixture over the live SSE path. Recorded
-playback—not reverse interpreter execution or pause/resume debugging—is the
-next UI target.
+The measured `emit_frame` contract, matrix microscope, and regression
+microscope are complete. Both recordings are pinned in the checked Yew handoff.
+Recorded playback—not reverse interpreter execution or pause/resume
+debugging—is the next UI target, ahead of K-means.
 
 Copyright (c) 2026 Michael A Wright. Distributed under the [MIT License](LICENSE).

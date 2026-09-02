@@ -60,6 +60,11 @@ supported, awkward, and blocked behavior using executable evidence.
 
 ## Saga 2: pure-MLPL proof of concept
 
+After the first two lessons, prioritize the implementation-ready Rust/Yew
+viewer handoff so interactive playback can proceed in `demo-extensions` before
+the K-means lesson. This ordering change does not authorize sibling edits from
+this repository.
+
 1. Implement matrix multiplication as concept stepping: inputs, selected row
    and column, products, partial sums, and completed output.
 2. Implement two-parameter linear regression/gradient descent with data,

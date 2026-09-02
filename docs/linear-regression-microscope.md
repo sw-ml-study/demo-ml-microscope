@@ -41,7 +41,7 @@ Every checkpoint contains:
 - `regression/trajectory/point` — `[slope,bias,loss]` for a generic path view.
 
 Step zero also contains the authoritative feature and label vectors. The
-recording has five frames, 32 observations, and 83 numeric values, within its
+recording has five frames, 32 observations, and 88 numeric values, within its
 declared budgets.
 
 ## Run and verify

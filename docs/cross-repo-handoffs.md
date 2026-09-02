@@ -28,6 +28,10 @@ measured consumers prove.
 
 ## `../demo-extensions`: preferred Rust/Yew WASM microscope
 
+The authoritative implementation work order is
+[`docs/yew-viewer-handoff.md`](yew-viewer-handoff.md). This section summarizes
+ownership; when details differ, the pinned handoff and fixture index govern.
+
 Trigger: this repo has the measured ordered SSE contract plus matrix lesson
 fixtures. Yew/WASM is the preferred full-featured UI; existing native graphics
 support is optional follow-up work.

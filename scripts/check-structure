@@ -7,7 +7,9 @@ for path in AGENTS.md COPYRIGHT LICENSE README.md catalog/lessons.toml justfile 
     docs/architecture.md docs/cross-repo-handoffs.md docs/plan.md \
     docs/graphics-options.md docs/linear-regression-microscope.md \
     docs/matrix-microscope.md docs/observation-contract.md docs/research.txt docs/sagas.md \
-    docs/sw-mlpl-blockers.md mlplunit.conf; do
+    docs/sw-mlpl-blockers.md docs/yew-viewer-handoff.md \
+    fixtures/yew/index-v1.json fixtures/yew/recording-schema-v0.json \
+    mlplunit.conf; do
     if [ ! -f "$repo_dir/$path" ]; then
         echo "missing required file: $path" >&2
         exit 1

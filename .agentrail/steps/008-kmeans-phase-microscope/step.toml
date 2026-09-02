@@ -1,4 +1,4 @@
-number = 7
+number = 8
 slug = "kmeans-phase-microscope"
 status = "pending"
 description = "Build the third visible microscope lesson using TDD: deterministic bounded tw..."

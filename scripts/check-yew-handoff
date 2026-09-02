@@ -1,0 +1,53 @@
+#!/bin/sh
+set -eu
+
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+index="$repo_root/fixtures/yew/index-v1.json"
+
+jq -e '
+  .schema == "sw-ml-study.ml-microscope-fixture-index" and
+  .version == 1 and
+  (.fixtures | length) == 2 and
+  ([.fixtures[].id] == ["MM01", "LR01"])
+' "$index" >/dev/null
+
+validate_recording() {
+    fixture=$1
+    jq -e '
+      def product: reduce .[] as $value (1; . * $value);
+      .schema == "sw-ml-study.ml-microscope-recording" and
+      .version == 0 and
+      (.frames | length) <= .budgets.max_frames and
+      ([.frames[].observations | length] | max) <= .budgets.max_observations_per_frame and
+      ([.frames[].observations[].values | length] | max) <= .budgets.max_values_per_observation and
+      ([.frames[].observations[].values | length] | add) <= .budgets.max_total_values and
+      (all(.frames[].observations[]; (.shape | product) == (.values | length))) and
+      ([.frames[].step] == ([.frames[].step] | sort | unique))
+    ' "$fixture" >/dev/null
+}
+
+for encoded in $(jq -r '.fixtures[] | @base64' "$index"); do
+    field() {
+        printf '%s' "$encoded" | base64 --decode | jq -r "$1"
+    }
+    recording=$(field '.recording')
+    source=$(field '.source')
+    preview=$(field '.preview')
+    guide=$(field '.guide')
+    for path in "$recording" "$source" "$preview" "$guide"; do
+        [ -f "$repo_root/$path" ] || { echo "missing indexed Yew input: $path" >&2; exit 1; }
+    done
+    validate_recording "$repo_root/$recording"
+    recording_hash=$(shasum -a 256 "$repo_root/$recording" | awk '{print $1}')
+    source_hash=$(shasum -a 256 "$repo_root/$source" | awk '{print $1}')
+    [ "$recording_hash" = "$(field '.recording_sha256')" ] || { echo "recording hash drift: $recording" >&2; exit 1; }
+    [ "$source_hash" = "$(field '.source_sha256')" ] || { echo "source hash drift: $source" >&2; exit 1; }
+    frame_count=$(jq '[.frames[]] | length' "$repo_root/$recording")
+    observation_count=$(jq '[.frames[].observations[]] | length' "$repo_root/$recording")
+    value_count=$(jq '[.frames[].observations[].values | length] | add' "$repo_root/$recording")
+    [ "$frame_count" = "$(field '.frame_count')" ] || { echo "frame count drift: $recording" >&2; exit 1; }
+    [ "$observation_count" = "$(field '.observation_count')" ] || { echo "observation count drift: $recording" >&2; exit 1; }
+    [ "$value_count" = "$(field '.value_count')" ] || { echo "value count drift: $recording" >&2; exit 1; }
+done
+
+echo "PASS shared Yew schema, pinned hashes, budgets, shapes, order, and fixture counts"

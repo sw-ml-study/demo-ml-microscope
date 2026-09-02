@@ -1,0 +1,37 @@
+{
+  "schema": "sw-ml-study.ml-microscope-fixture-index",
+  "version": 1,
+  "recording_schema": "fixtures/yew/recording-schema-v0.json",
+  "source_repository": "https://github.com/sw-ml-study/demo-ml-microscope.git",
+  "source_revision": "21276a44c29501c37519f5f9f534f54351fbefb4",
+  "fixtures": [
+    {
+      "id": "MM01",
+      "lesson": "matrix-multiplication",
+      "source": "demos/matrix_microscope.mlpl",
+      "recording": "fixtures/yew/matrix-run-v0.json",
+      "preview": "assets/previews/matrix-microscope.svg",
+      "guide": "docs/matrix-microscope.md",
+      "recording_sha256": "6342be3ca9a8e17465310761c7039193ec2b0bc2d2e9eb3a835534a0747b148a",
+      "source_sha256": "2cb6fbfd6ae1991437075a80c02a04144255753e2a114119fea5d11456fc3e61",
+      "frame_count": 5,
+      "observation_count": 8,
+      "value_count": 24,
+      "steps": [0, 1, 2, 3, 4]
+    },
+    {
+      "id": "LR01",
+      "lesson": "linear-regression",
+      "source": "demos/linear_regression_microscope.mlpl",
+      "recording": "fixtures/yew/linear-regression-run-v0.json",
+      "preview": "assets/previews/linear-regression-microscope.svg",
+      "guide": "docs/linear-regression-microscope.md",
+      "recording_sha256": "92f80e2997b6fc5b0cf0ee46484062f836d2f79f119f705b34fc29a6fa39e9b4",
+      "source_sha256": "a53c47f969c83bb11f5696b8b46e6f855ce8794eb7b488fde2676cd5b2e5b8ba",
+      "frame_count": 5,
+      "observation_count": 32,
+      "value_count": 88,
+      "steps": [0, 1, 2, 4, 8]
+    }
+  ]
+}

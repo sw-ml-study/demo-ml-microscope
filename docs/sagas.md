@@ -7,8 +7,8 @@ the README, architecture, plan, ownership handoffs, capability ledger, and
 documentation-only `just check` gate.
 
 Acceptance: generated instructions are current, peer license files compare
-byte-for-byte, local documentation links resolve, `sw-checklist` passes, and no
-sibling worktree is modified.
+byte-for-byte, local documentation links resolve, the local MLPL/documentation
+gate passes, and no sibling worktree is modified.
 
 ## Queued: measured emit-frame contract
 

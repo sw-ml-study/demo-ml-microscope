@@ -277,8 +277,9 @@ source. Do not create a duplicate `CLAUDE.md`.
 - Use a root `justfile` as the entry point and keep recipes thin. Portable work
   belongs in `scripts/`; do not add Makefiles.
 - Before every commit and push, run `scripts/check-mlpl-style` and `just check`.
-  The full gate must include `sw-checklist`, documentation/structure checks,
-  executable probes, demos, and mlplunit once those artifacts exist.
+  The full gate must include documentation/structure checks, executable probes,
+  demos, and mlplunit once those artifacts exist. `sw-checklist` applies only
+  to Rust work in `../demo-extensions`, not to this MLPL repository.
 - Update README, architecture, lesson catalog, capability ledger, handoffs, and
   acceptance evidence in the same step as affected behavior.
 - Inspect `.gitignore` and `git status --short`, stage named paths, commit on

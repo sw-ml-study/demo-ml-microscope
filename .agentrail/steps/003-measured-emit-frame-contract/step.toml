@@ -1,4 +1,4 @@
-number = 2
+number = 3
 slug = "measured-emit-frame-contract"
 status = "pending"
 description = "Use TDD to establish native mlplunit and tool-selection infrastructure, then ..."

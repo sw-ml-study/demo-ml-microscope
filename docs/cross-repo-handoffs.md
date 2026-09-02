@@ -43,7 +43,8 @@ The extension agent should:
 3. reuse the established `winit`/`wgpu`, worker/parked-main Port, retained-state,
    and headless-test architecture where it is a clean fit;
 4. keep ingestion, validation, storage, layout, rendering, and input handling
-   responsibility-separated and within `sw-checklist` size limits;
+   responsibility-separated and run `sw-checklist` there because this is the
+   Rust workstream to which that tool applies;
 5. prove the parser and state transitions headlessly; make interactive smoke
    checks opt-in; document ownership/copy/lifetime and retained-byte budgets;
 6. expose only generic private-provider/public-MLPL-facade operations if live

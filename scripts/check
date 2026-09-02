@@ -6,14 +6,3 @@ repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 "$repo_dir/scripts/check-structure"
 "$repo_dir/scripts/check-doc-links"
 "$repo_dir/scripts/check-mlpl-style"
-
-if ! checklist_output=$(sw-checklist "$repo_dir" 2>&1); then
-    expected="No Cargo.toml files found in \"$repo_dir\""
-    if [ "$checklist_output" != "$expected" ]; then
-        echo "$checklist_output" >&2
-        exit 1
-    fi
-    echo "sw-checklist: MLPL-only repository (no Cargo.toml)"
-else
-    echo "$checklist_output"
-fi

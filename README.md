@@ -63,10 +63,10 @@ just check
 ```
 
 It currently checks repository structure, documentation links, the generated
-Agentrail briefing, MLPL style readiness, and invokes `sw-checklist` (accepting
-its exact no-`Cargo.toml` result while this remains an MLPL-only repository).
-Future executable steps must extend the gate with capability probes, demos, and
-native mlplunit tests.
+Agentrail briefing, and MLPL style readiness. Future executable steps must
+extend the gate with capability probes, demos, and native mlplunit tests.
+`sw-checklist` is reserved for Rust work in `../demo-extensions` and is not a
+gate for this MLPL repository.
 
 ## Current status
 

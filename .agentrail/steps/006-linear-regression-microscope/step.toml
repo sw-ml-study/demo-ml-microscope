@@ -1,8 +1,9 @@
 number = 6
 slug = "linear-regression-microscope"
-status = "in-progress"
+status = "completed"
 description = "Build the second visible microscope lesson using TDD: a bounded deterministic..."
 role = "legacy"
 context_files = []
 created_at = "2026-09-01T20:20:56"
-commits = []
+completed_at = "2026-09-01T20:32:01"
+commits = ["74eeab2f8a56bbef928329af6cb831a0bd999980"]

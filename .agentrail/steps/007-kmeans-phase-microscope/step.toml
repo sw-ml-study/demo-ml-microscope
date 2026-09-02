@@ -1,0 +1,8 @@
+number = 7
+slug = "kmeans-phase-microscope"
+status = "pending"
+description = "Build the third visible microscope lesson using TDD: deterministic bounded tw..."
+role = "legacy"
+context_files = []
+created_at = "2026-09-01T20:32:01"
+commits = []

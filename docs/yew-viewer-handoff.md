@@ -7,12 +7,13 @@ implementation.
 ## Pinned producer inputs
 
 Clone or vendor `sw-ml-study/demo-ml-microscope` at commit
-`21276a44c29501c37519f5f9f534f54351fbefb4`. The machine-readable entry point
+`9ea15cf6ece58752238f2fee799b4ce008a4aa8c`. The machine-readable entry point
 is [`fixtures/yew/index-v1.json`](../fixtures/yew/index-v1.json). It pins hashes,
 counts, steps, lesson sources, previews, and recordings for:
 
 - MM01: five consecutive concept frames, eight observations, 24 values;
 - LR01: five nonconsecutive training checkpoints, 32 observations, 88 values.
+- KM01: five alternating phase frames, 14 observations, 74 values.
 
 Both use [`recording-schema-v0.json`](../fixtures/yew/recording-schema-v0.json).
 The JSON Schema describes structure. Consumer code must additionally enforce
@@ -164,7 +165,7 @@ No meaning may depend on motion or color.
 
 Native/headless model tests must cover:
 
-- both pinned fixtures parse and match indexed hashes/counts/steps;
+- all pinned fixtures parse and match indexed hashes/counts/steps;
 - every validation failure listed above, including checked-multiply overflow;
 - Next/Previous clamp, Seek bounds, Play/Restart/Tick/Pause, final auto-pause;
 - LR01 nonconsecutive steps navigate by retained index;
@@ -221,7 +222,9 @@ also deployed; offline fixture playback remains fully functional without it.
 
 ## Exit criteria
 
-The handoff is complete in `demo-extensions` when both pinned fixtures can be
+The original offline handoff was delivered for MM01 and LR01 at
+`demo-extensions` commits `2ef0e33` and `3ecd025`. Its next integration is
+complete when all three pinned fixtures can be
 loaded offline and stepped with Previous/Next/Play/Pause/Seek, all model and
 browser acceptance tests pass, the Rust gate including `sw-checklist` passes,
 and a documented local URL displays exact numeric fallbacks. Live SSE execution

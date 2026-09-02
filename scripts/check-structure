@@ -5,7 +5,7 @@ repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 
 for path in AGENTS.md COPYRIGHT LICENSE README.md catalog/lessons.toml justfile \
     docs/architecture.md docs/cross-repo-handoffs.md docs/plan.md \
-    docs/graphics-options.md docs/linear-regression-microscope.md \
+    docs/graphics-options.md docs/kmeans-microscope.md docs/linear-regression-microscope.md \
     docs/matrix-microscope.md docs/observation-contract.md docs/research.txt docs/sagas.md \
     docs/sw-mlpl-blockers.md docs/yew-viewer-handoff.md \
     fixtures/yew/index-v1.json fixtures/yew/recording-schema-v0.json \

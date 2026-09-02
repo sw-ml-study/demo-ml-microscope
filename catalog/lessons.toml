@@ -14,6 +14,18 @@ observations = 8
 status = "accepted"
 
 [[lesson]]
+id = "KM01"
+slug = "kmeans-phases"
+title = "Assignment and update are distinct phases"
+source = "demos/kmeans_microscope.mlpl"
+test = "tests/test_kmeans_microscope.mlpl"
+preview = "assets/previews/kmeans-microscope.svg"
+recording = "fixtures/yew/kmeans-run-v0.json"
+steps = 5
+observations = 14
+status = "accepted"
+
+[[lesson]]
 id = "LR01"
 slug = "linear-regression"
 title = "Gradient descent fits slope and bias"

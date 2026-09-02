@@ -44,6 +44,18 @@ regression-fixture:
 regression-recording:
     ./scripts/run-regression-recording
 
+# Run the K-means phase microscope and check its SVG preview.
+kmeans:
+    ./scripts/run-kmeans-demo
+
+# Validate the committed Rust/Yew K-means recording fixture.
+kmeans-fixture:
+    ./scripts/check-kmeans-recording
+
+# Prove live K-means SSE matches the committed recording.
+kmeans-recording:
+    ./scripts/run-kmeans-recording
+
 # Validate the pinned cross-repository Rust/Yew implementation handoff.
 yew-handoff:
     ./scripts/check-yew-handoff

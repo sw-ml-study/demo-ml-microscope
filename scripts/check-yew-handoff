@@ -7,8 +7,9 @@ index="$repo_root/fixtures/yew/index-v1.json"
 jq -e '
   .schema == "sw-ml-study.ml-microscope-fixture-index" and
   .version == 1 and
-  (.fixtures | length) == 2 and
-  ([.fixtures[].id] == ["MM01", "LR01"])
+  .source_revision == "9ea15cf6ece58752238f2fee799b4ce008a4aa8c" and
+  (.fixtures | length) == 3 and
+  ([.fixtures[].id] == ["MM01", "LR01", "KM01"])
 ' "$index" >/dev/null
 
 validate_recording() {

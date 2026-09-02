@@ -49,6 +49,13 @@ to handle nonconsecutive retained steps, scalar and vector observations,
 repeated semantic names, loss plotting, and a three-value trajectory point
 without adding regression-specific Rust types.
 
+The third input is `fixtures/yew/kmeans-run-v0.json` at producer revision
+`9ea15cf6ece58752238f2fee799b4ce008a4aa8c`. It adds alternating assignment and
+update prefixes, repeated names, rank-two distance evidence, and a zero final
+delta. The sibling agent should vendor this revision, extend its fixture menu
+and provenance hashes, and demonstrate that existing generic reducer and
+shape-directed views handle KM01 without algorithm-specific Rust.
+
 The extension agent should:
 
 1. create a Yew WASM application that connects to the existing sw-MLPL session

@@ -3,7 +3,7 @@
   "version": 1,
   "recording_schema": "fixtures/yew/recording-schema-v0.json",
   "source_repository": "https://github.com/sw-ml-study/demo-ml-microscope.git",
-  "source_revision": "21276a44c29501c37519f5f9f534f54351fbefb4",
+  "source_revision": "9ea15cf6ece58752238f2fee799b4ce008a4aa8c",
   "fixtures": [
     {
       "id": "MM01",
@@ -32,6 +32,20 @@
       "observation_count": 32,
       "value_count": 88,
       "steps": [0, 1, 2, 4, 8]
+    },
+    {
+      "id": "KM01",
+      "lesson": "kmeans-phases",
+      "source": "demos/kmeans_microscope.mlpl",
+      "recording": "fixtures/yew/kmeans-run-v0.json",
+      "preview": "assets/previews/kmeans-microscope.svg",
+      "guide": "docs/kmeans-microscope.md",
+      "recording_sha256": "971b5cdbb8aa57aebeda14dfeeaab6f817a0ac362a0db85683f29055a91c2695",
+      "source_sha256": "3e066d52f00fed1a7240b3e35b2690a1ce6f1af622ad50e8e3f424327e890f9b",
+      "frame_count": 5,
+      "observation_count": 14,
+      "value_count": 74,
+      "steps": [0, 1, 2, 3, 4]
     }
   ]
 }

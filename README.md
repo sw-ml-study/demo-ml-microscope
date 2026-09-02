@@ -78,10 +78,29 @@ Read the [LR01 lesson guide](docs/linear-regression-microscope.md), the
 [standalone MLPL source](demos/linear_regression_microscope.mlpl), or the
 [recording fixture](fixtures/yew/linear-regression-run-v0.json).
 
+## K-means phase microscope
+
+KM01 separates assignment from update instead of hiding both operations in one
+iteration. Six fixed 2-D points converge after two updates, with squared
+distances, labels, objective, centroids, cluster counts, and centroid movement
+available as exact retained observations.
+
+![K-means points and centroids alongside exact assignment and update phase evidence](assets/previews/kmeans-microscope.svg)
+
+```sh
+just kmeans             # run MLPL and check the generated visual
+just kmeans-recording   # prove live SSE equals the Yew fixture
+```
+
+Read the [KM01 lesson guide](docs/kmeans-microscope.md), the
+[standalone MLPL source](demos/kmeans_microscope.mlpl), or the
+[recording fixture](fixtures/yew/kmeans-run-v0.json).
+
 ## Interactive viewer status
 
-Interactive playback is now prioritized ahead of the third lesson. This repo
-contains an implementation-ready, revision-pinned
+The offline Rust/Yew viewer has been delivered in `../demo-extensions` with
+Previous/Next/Play/Pause/Seek over MM01 and LR01. This repo contains its
+revision-pinned
 [Rust/Yew viewer handoff](docs/yew-viewer-handoff.md), shared
 [recording schema](fixtures/yew/recording-schema-v0.json), and checked
 [fixture index](fixtures/yew/index-v1.json). Run:
@@ -90,8 +109,9 @@ contains an implementation-ready, revision-pinned
 just yew-handoff
 ```
 
-The actual Previous/Next/Play/Pause/Seek UI must be implemented by the
-`../demo-extensions` agent; it is not yet available to open from this repo.
+KM01 is now the third producer fixture. The next `../demo-extensions` agent
+should vendor the indexed producer revision and prove that the same generic UI
+renders its assignment/update phases without K-means-specific Rust.
 
 Only after those share a stable observation vocabulary will the project move
 through MLP forward/backward state, PCA, attention, a tiny language model,
@@ -129,9 +149,9 @@ gate for this MLPL repository.
 
 ## Current status
 
-The measured `emit_frame` contract, matrix microscope, and regression
-microscope are complete. Both recordings are pinned in the checked Yew handoff.
-Recorded playback—not reverse interpreter execution or pause/resume
-debugging—is the next UI target, ahead of K-means.
+The measured `emit_frame` contract and the matrix, regression, and K-means
+microscopes are complete. All three recordings are pinned in the checked Yew
+handoff. The next local task is reviewing their shared observation mechanisms;
+live evaluator control and reverse execution remain outside this milestone.
 
 Copyright (c) 2026 Michael A Wright. Distributed under the [MIT License](LICENSE).

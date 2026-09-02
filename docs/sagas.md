@@ -39,24 +39,27 @@ Accepted: LR01 performs eight explicit analytic-gradient updates, retains five
 checkpoints with 32 observations, reduces MSE from 21 below 0.0004, generates a
 freshness-checked SVG, and matches its bounded Yew fixture over live SSE.
 
-## Completed locally / queued in sibling: Yew interactive viewer handoff
+## Completed locally and in sibling: Yew interactive viewer handoff
 
 The shared schema, hash-pinned fixture index, two consumer recordings, pure
 model boundaries, reducer semantics, generic views, accessibility behavior,
 native/browser acceptance cases, and build/run/deploy contract are frozen in
 `docs/yew-viewer-handoff.md`.
 
-Next external action: an independently authorized `../demo-extensions` agent
-implements the Rust/Yew app and runs `sw-checklist` there. This repository
-cannot claim interactive playback until that sibling work is delivered.
+The independently authorized `../demo-extensions` agent delivered the offline
+Rust/Yew app at commits `2ef0e33` and `3ecd025`, including its Rust checks and
+Agentrail closeout. Live browser-to-server execution remains a later layer.
 
-## Queued after interactive viewer handoff: K-means phases
+## Completed: K-means phases
 
-Implement bounded deterministic K-means assignment/update phases. Use the
-lesson to decide how multiple named observations group into one logical frame.
+KM01 implements bounded deterministic K-means assignment/update phases. Five
+frames and fourteen observations establish grouping by numeric step plus
+slash-separated semantic prefix, with stable call order and no new protocol
+field or algorithm-specific renderer.
 
 ## Future
 
-After the Yew sibling handoff and third lesson: review and hand off a reusable
-MLPL helper. Then add MLP forward/backward, PCA, attention, tiny LM, LoRA, and
-Engram. Optional native graphics remain a separate renderer handoff.
+Review the three consumers and hand off a reusable MLPL observation helper.
+The `demo-extensions` agent should first vendor KM01 into its generic viewer.
+Then add MLP forward/backward, PCA, attention, tiny LM, LoRA, and Engram.
+Optional native graphics remain a separate renderer handoff.
